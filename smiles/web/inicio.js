@@ -1,7 +1,7 @@
 import './inicio.css';
 import $ from 'jquery';
 import { app, version } from '../wii.js';
-import * as brain from '../head/brain.js';
+import * as brain from './head/brain.js';
 
 export const render = () => `
   <div class="miia">
@@ -10,7 +10,7 @@ export const render = () => `
       <!-- Empty State Inicial -->
       <div class="miia_empty">
         <div class="miia_welcome_icon">
-          <img src="/smile.avif" alt="Mediawii" class="welcome_avatar">
+          <img src="/smile.avif" alt="ChatWiil" class="welcome_avatar">
         </div>
         <h2 class="miia_welcome_title">¡Hola! Soy ChatWiil 🕊️</h2>
         <p class="miia_welcome_text">
@@ -94,20 +94,26 @@ export const init = () => {
 
     // Procesar con el cerebro
     isTyping = true;
-    setTimeout(() => {
-      addTypingIndicator();
+    addTypingIndicator();
+    
+    try {
+      // 🧠 USAR EL CEREBRO PARA PROCESAR
+      const response = await brain.process(message);
       
-      setTimeout(async () => {
-        removeTypingIndicator();
-        
-        // 🧠 USAR EL CEREBRO PARA PROCESAR
-        const response = await brain.process(message);
-        
-        typeWriterEffect(response, 'ai', () => {
-          isTyping = false;
-        });
-      }, 1500 + Math.random() * 1000);
-    }, 500);
+      removeTypingIndicator();
+      
+      // Verificar que la respuesta sea un string válido
+      const validResponse = typeof response === 'string' ? response : '🤔 Lo siento, hubo un error al procesar tu mensaje.';
+      
+      typeWriterEffect(validResponse, 'ai', () => {
+        isTyping = false;
+      });
+    } catch (error) {
+      console.error('Error en brain.process:', error);
+      removeTypingIndicator();
+      addMessage('🤔 Lo siento, hubo un error al procesar tu mensaje. Por favor, intenta de nuevo.', 'ai');
+      isTyping = false;
+    }
   };
 
   // Enter para enviar (Shift+Enter para nueva línea)
@@ -201,11 +207,11 @@ export const init = () => {
     const $typewriter = $('#typewriter');
     
     let i = 0;
-    const speed = 15; // Más rápido para mejor UX
+    const speed = 15;
     
     function type() {
       if (i < text.length) {
-        // Si el siguiente carácter es parte de una etiqueta HTML, agregar toda la etiqueta de una vez
+        // Si el siguiente carácter es '<', procesar toda la etiqueta HTML
         if (text[i] === '<') {
           const closingTag = text.indexOf('>', i);
           if (closingTag !== -1) {
@@ -213,11 +219,12 @@ export const init = () => {
             $typewriter.append(htmlTag);
             i = closingTag + 1;
             scrollToBottom();
-            setTimeout(type, 0); // Sin delay para etiquetas HTML
+            setTimeout(type, 0);
             return;
           }
         }
         
+        // Agregar carácter normal
         $typewriter.append(text.charAt(i));
         i++;
         scrollToBottom();
@@ -236,11 +243,11 @@ export const init = () => {
     $messages.animate({ scrollTop: $messages[0].scrollHeight }, 300);
   }
 
-  console.log(`✅ Chatwiil IA ${version} iniciado con 🧠 Brain System + 🎭 Personalidad`);
+  console.log(`✅ ChatWiil IA ${version} iniciado con 🧠 Brain System + 🎭 Personalidad`);
 };
 
 export const cleanup = () => {
   $('#miiaInput, #miiaSend').off();
   $(document).off('click', '.suggestion_card');
-  console.log('🧹 Chatwiil IA limpiado');
+  console.log('🧹 ChatWiil IA limpiado');
 };
