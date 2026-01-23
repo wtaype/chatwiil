@@ -1,4 +1,3 @@
-import('./footer.js')
 import $ from 'jquery';
 import { getls } from './widev.js';
 import { rutas } from './rutas/ruta.js';
