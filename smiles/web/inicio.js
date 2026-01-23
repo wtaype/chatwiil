@@ -65,6 +65,7 @@ export const init = () => {
   const $input = $('#miiaInput');
   const $sendBtn = $('#miiaSend');
   let isTyping = false;
+  let messageCounter = 0; // ✅ Contador único para IDs
 
   // ========== AUTO-RESIZE TEXTAREA (SIN SCROLL) ==========
   $input.on('input', function() {
@@ -102,16 +103,18 @@ export const init = () => {
       
       removeTypingIndicator();
       
-      // Verificar que la respuesta sea un string válido
-      const validResponse = typeof response === 'string' ? response : '🤔 Lo siento, hubo un error al procesar tu mensaje.';
+      // ✅ Verificar que sea string válido
+      if (typeof response !== 'string') {
+        throw new Error('Respuesta no válida del cerebro');
+      }
       
-      typeWriterEffect(validResponse, 'ai', () => {
+      typeWriterEffect(response, 'ai', () => {
         isTyping = false;
       });
     } catch (error) {
-      console.error('Error en brain.process:', error);
+      console.error('❌ Error procesando mensaje:', error);
       removeTypingIndicator();
-      addMessage('🤔 Lo siento, hubo un error al procesar tu mensaje. Por favor, intenta de nuevo.', 'ai');
+      addMessage('😔 Disculpa, tuve un problema procesando tu mensaje. Por favor, intenta de nuevo. 💚', 'ai');
       isTyping = false;
     }
   };
@@ -163,6 +166,9 @@ export const init = () => {
 
   // ========== TYPING INDICATOR ==========
   function addTypingIndicator() {
+    // ✅ Eliminar indicadores previos
+    removeTypingIndicator();
+    
     const typingHTML = `
       <div class="miia_message ai typing">
         <div class="message_avatar">
@@ -185,10 +191,21 @@ export const init = () => {
     $('.miia_message.typing').remove();
   }
 
-  // ========== EFECTO TYPEWRITER CON HTML ==========
+  // ========== EFECTO TYPEWRITER CON HTML (ID ÚNICO) ==========
   function typeWriterEffect(text, type, callback) {
+    // ✅ Validación estricta del texto
+    if (typeof text !== 'string' || text.length === 0) {
+      console.error('❌ typeWriterEffect recibió texto inválido:', text);
+      addMessage('🤔 Lo siento, hubo un error al generar la respuesta.', 'ai');
+      if (callback) callback();
+      return;
+    }
+
     const time = new Date().toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' });
     const avatar = '<img src="/smile.avif" alt="ChatWiil" class="message_avatar_img">';
+    
+    // ✅ ID ÚNICO para cada mensaje (evita duplicados en producción)
+    const uniqueId = `typewriter_${Date.now()}_${++messageCounter}`;
     
     const messageHTML = `
       <div class="miia_message ${type}" data-time="${time}">
@@ -198,13 +215,20 @@ export const init = () => {
             <span class="message_name">ChatWiil</span>
             <span class="message_time">${time}</span>
           </div>
-          <div class="message_text" id="typewriter"></div>
+          <div class="message_text" id="${uniqueId}"></div>
         </div>
       </div>
     `;
 
     $messages.append(messageHTML);
-    const $typewriter = $('#typewriter');
+    const $typewriter = $(`#${uniqueId}`);
+    
+    // ✅ Verificar que el elemento existe
+    if ($typewriter.length === 0) {
+      console.error('❌ No se encontró el elemento typewriter con ID:', uniqueId);
+      if (callback) callback();
+      return;
+    }
     
     let i = 0;
     const speed = 15;
@@ -230,6 +254,7 @@ export const init = () => {
         scrollToBottom();
         setTimeout(type, speed);
       } else {
+        // ✅ Remover ID al terminar
         $typewriter.removeAttr('id');
         if (callback) callback();
       }
