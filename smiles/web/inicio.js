@@ -1,7 +1,7 @@
 import './inicio.css';
 import $ from 'jquery';
 import { app, version } from '../wii.js';
-import * as brain from './head/brain.js';
+import * as brain from '../head/brain.js';
 
 export const render = () => `
   <div class="miia">
