@@ -11,7 +11,7 @@ export const render = () => `
         <span>Versión ${version}</span>
       </div>
       <div class="hero_logo">
-        <i class="fas fa-dove"></i>
+        <img src="/smile.avif" alt="${app}" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; box-shadow: 0 8px 30px rgba(0,0,0,0.2);">
       </div>
       <h1 class="hero_title">${app}</h1>
       <p class="hero_subtitle">Tu asistente espiritual inteligente con fe, matemáticas, programación y más 🙏💚</p>
@@ -108,6 +108,9 @@ export const render = () => `
             <li><i class="fas fa-check"></i> Detecta emociones del usuario</li>
             <li><i class="fas fa-check"></i> Lenguaje casual y motivador</li>
             <li><i class="fas fa-check"></i> Responde a cumplidos y despedidas</li>
+            <li><i class="fas fa-check"></i> Normalización de texto (tildes)</li>
+            <li><i class="fas fa-check"></i> 50+ variaciones de cumplidos</li>
+            <li><i class="fas fa-check"></i> Frases positivas inspiradoras</li>
           </ul>
         </div>
         <div class="tech_card">
@@ -219,7 +222,7 @@ export const render = () => `
           <div class="tech_header">
             <i class="fas fa-comments"></i>
             <h3>Lenguaje Base (lenguaje.js)</h3>
-            <span class="tech_badge low">Prioridad 0.5</span>
+            <span class="tech_badge low">Prioridad 0.1</span>
           </div>
           <ul class="tech_list">
             <li><i class="fas fa-check"></i> Procesamiento lingüístico básico</li>
@@ -253,7 +256,7 @@ export const render = () => `
           <div class="step_number">1</div>
           <div class="step_content">
             <h3>📥 Recepción</h3>
-            <p>Recibes tu pregunta y la guarda en memoria contextual</p>
+            <p>Recibe tu pregunta y la guarda en memoria contextual</p>
           </div>
         </div>
         <div class="flow_arrow">→</div>
@@ -306,10 +309,34 @@ export const render = () => `
       <div class="version_timeline">
         
         <div class="version_item">
-          <div class="version_badge current">v1.0</div>
+          <div class="version_badge current">v${version}</div>
+          <div class="version_content">
+            <h3>Versión ${version} - Actualización Mayor 🚀</h3>
+            <p class="version_date"><i class="far fa-calendar"></i> Enero 23, 2026</p>
+            <ul>
+              <li>✨ <strong>Normalización de texto mejorada</strong> - Detecta palabras con y sin tildes</li>
+              <li>🎭 <strong>Personalidad ampliada</strong> - 50+ variaciones de respuestas a cumplidos</li>
+              <li>💪 <strong>Motivación mejorada</strong> - Detecta "dame motivación", "dame ánimos", etc.</li>
+              <li>📝 <strong>Frases positivas</strong> - 10 frases inspiradoras con función dedicada</li>
+              <li>🖼️ <strong>Avatar personalizado</strong> - Imagen smile.avif en mensajes y welcome</li>
+              <li>🧠 <strong>Brain.js optimizado</strong> - Detección inteligente con más patrones</li>
+              <li>🕊️ <strong>Prioridad máxima a wiil.js</strong> - Peso 0.99 para personalidad</li>
+              <li>📉 <strong>Lenguaje.js reducido</strong> - Peso 0.1 como respaldo final</li>
+              <li>⚡ <strong>Regex más flexibles</strong> - Mejor detección de variaciones</li>
+              <li>💚 <strong>Más respuestas empáticas</strong> - Apoyo emocional mejorado</li>
+              <li>🎨 <strong>Typewriter effect</strong> - HTML renderizado correctamente</li>
+              <li>📱 <strong>UI mejorada</strong> - Auto-resize textarea sin scroll</li>
+              <li>🔥 <strong>Sugerencias contextuales</strong> - 4 cards interactivas en inicio</li>
+              <li>✅ <strong>100+ pruebas realizadas</strong> - Sistema estable y robusto</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="version_item">
+          <div class="version_badge">v1.0</div>
           <div class="version_content">
             <h3>Versión 1.0 - Lanzamiento Oficial 🎉</h3>
-            <p class="version_date"><i class="far fa-calendar"></i> Enero 23, 2026</p>
+            <p class="version_date"><i class="far fa-calendar"></i> Enero 22, 2026</p>
             <ul>
               <li>🧠 Sistema modular con 11 módulos neuronales especializados</li>
               <li>🙏 Módulo de Fe con 50+ versículos y 5 oraciones poderosas</li>
@@ -327,8 +354,6 @@ export const render = () => `
               <li>🎨 5 temas dinámicos adaptables</li>
               <li>🔒 100% privacidad local (sin servidores)</li>
               <li>📱 Diseño responsive optimizado</li>
-              <li>✨ HTML renderizado correctamente</li>
-              <li>😊 Emojis y personalidad en todas las respuestas</li>
             </ul>
           </div>
         </div>
@@ -376,7 +401,7 @@ export const render = () => `
           </div>
           <div class="roadmap_info">
             <h3>Comandos de Voz</h3>
-            <p>Habla con ChatWiil usando tu voz y recibe respuestas en audio</p>
+            <p>Habla con ${app} usando tu voz y recibe respuestas en audio</p>
           </div>
         </div>
         <div class="roadmap_item">
@@ -395,6 +420,15 @@ export const render = () => `
           <div class="roadmap_info">
             <h3>Exportar Conversaciones</h3>
             <p>Guarda tus conversaciones importantes en PDF o TXT</p>
+          </div>
+        </div>
+        <div class="roadmap_item">
+          <div class="roadmap_icon planned">
+            <i class="fas fa-brain"></i>
+          </div>
+          <div class="roadmap_info">
+            <h3>Aprendizaje Personalizado</h3>
+            <p>El asistente aprenderá tus preferencias y adaptará sus respuestas</p>
           </div>
         </div>
       </div>
