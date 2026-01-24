@@ -41,7 +41,7 @@ export const render = () => `
       </button>
     </div>
     <div class="miia_input_info">
-      <span><i class="fas fa-info-circle"></i> Presiona <kbd>Enter</kbd> para enviar, <kbd>Shift + Enter</kbd> para nueva línea</span>
+      <span><i class="fas fa-info-circle"></i> Presiona <kbd>Enter</kbd> para enviar
     </div>
   </div>
 </div>`;
