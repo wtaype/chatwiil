@@ -69,15 +69,25 @@ export const init = () => {
   let autoScroll = true;
   const SCROLL_THRESHOLD = 120;
 
-  // Sanitizador básico para evitar que se renderice script/handlers en la respuesta
+  // Sanitizador con whitelist mínima y bloqueo de handlers/script
   const sanitize = (txt) => {
     if (typeof txt !== 'string') return '';
-    return txt
+    let clean = txt
       .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, '')
+      .replace(/<style[\s\S]*?>[\s\S]*?<\/style>/gi, '')
       .replace(/\son\w+="[^"]*"/gi, '')
       .replace(/\son\w+='[^']*'/gi, '')
       .replace(/javascript:/gi, '')
       .trim();
+
+    // Elimina tags no permitidos, conserva solo algunos seguros
+    const allowed = /(br|strong|b|em|i|u|code|pre|p|ul|ol|li|blockquote)/i;
+    clean = clean.replace(/<([^>]+)>/g, (match, tag) => {
+      const tagName = tag.split(' ')[0].replace(/\//g, '');
+      return allowed.test(tagName) ? `<${tag}>` : '';
+    });
+
+    return clean;
   };
 
   // Detecta si el usuario se aleja del fondo para pausar auto-scroll
@@ -111,7 +121,9 @@ export const init = () => {
 
     try {
       const raw = await brain.process(message);
+      console.debug('[ChatWiil] raw brain response:', raw);
       const response = sanitize(raw);
+      console.debug('[ChatWiil] sanitized response:', response);
       removeTypingIndicator();
 
       if (typeof response !== 'string' || response.length === 0) {
@@ -198,6 +210,7 @@ export const init = () => {
   // ========== EFECTO TYPEWRITER CON HTML (ID ÚNICO) ==========
   function typeWriterEffect(text, type, callback) {
     const safeText = sanitize(text);
+    console.debug('[ChatWiil] typewriter safeText:', safeText);
     if (typeof safeText !== 'string' || safeText.length === 0) {
       console.error('❌ typeWriterEffect recibió texto inválido:', text);
       addMessage('🤔 Lo siento, hubo un error al generar la respuesta.', 'ai', true);

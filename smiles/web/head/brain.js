@@ -10,13 +10,19 @@ import * as devs from './devs.js';
 import * as fe from './fe.js';
 import * as wiil from './wiil.js'; // 🎭 PERSONALIDAD
 
+const toSafeString = (val) => {
+  if (typeof val === 'string') return val;
+  if (val === null || val === undefined) return '';
+  try { return String(val); } catch { return ''; }
+};
+
 // 🧠 CEREBRO: Detecta qué módulos usar
 export const analyze = (userMessage) => {
-  const msg = userMessage.toLowerCase();
+  const msg = toSafeString(userMessage).toLowerCase();
   const modules = [];
 
   // ========== DETECCIÓN DE MÓDULOS (Prioridad por peso) ==========
-  
+
   // 🎭 PERSONALIDAD (Prioridad MÁXIMA - incluye más patrones)
   if (/gracias|motivación|motívame|eres genial|eres increíble|eres el mejor|eres lo máximo|eres cool|eres un crack|eres top|eres pro|eres god|eres bacán|eres chévere|cómo estás|qué tal|adiós|chao|bye|feliz|te amo|me caes bien|hola|hey|buenas|qué onda|jaja|jeje|lol|xd/i.test(msg)) {
     modules.push({ name: 'wiil', weight: 0.99, module: wiil }); // Peso máximo
@@ -77,31 +83,34 @@ export const analyze = (userMessage) => {
 // 🎯 PROCESAR RESPUESTA
 export const process = async (userMessage) => {
   try {
+    const userSafe = toSafeString(userMessage);
+
     // 1. Guardar en memoria
-    memoria.save({ role: 'user', content: userMessage });
+    memoria.save({ role: 'user', content: userSafe });
 
     // 2. Detectar módulos necesarios
-    const modules = analyze(userMessage);
-
-    console.log('🧠 Módulos detectados:', modules.map(m => `${m.name} (${m.weight})`));
+    const modules = analyze(userSafe);
+    console.debug('🧠 Módulos detectados:', modules.map(m => `${m.name} (${m.weight})`));
 
     // 3. Verificar ética primero
-    const ethicsCheck = etica.validate(userMessage);
+    const ethicsCheck = etica.validate(userSafe);
     if (!ethicsCheck.safe) {
+      console.debug('🛡️ Ética bloqueó:', ethicsCheck.reason);
       memoria.save({ role: 'assistant', content: ethicsCheck.response });
       return ethicsCheck.response;
     }
 
     // 4. Detectar emoción del usuario (para respuesta empática)
-    const emotion = wiil.detectEmotion(userMessage);
+    const emotion = wiil.detectEmotion(userSafe);
 
     // 5. Combinar respuestas de módulos activos (máximo 3)
     let response = null;
     
     for (const { name, module } of modules.slice(0, 3)) {
       try {
-        const moduleResponse = await module.generate(userMessage);
-        if (moduleResponse) {
+        const moduleResponse = await module.generate(userSafe);
+        console.debug(`↩️ Respuesta módulo ${name}:`, moduleResponse);
+        if (moduleResponse && typeof moduleResponse === 'string') {
           response = moduleResponse;
           console.log(`✅ Respuesta generada por: ${name}`);
           break; // Usar la primera respuesta válida
@@ -113,7 +122,8 @@ export const process = async (userMessage) => {
 
     // 6. Si ningún módulo generó respuesta, usar lenguaje por defecto
     if (!response) {
-      response = lenguaje.generate(userMessage);
+      response = lenguaje.generate(userSafe);
+      console.debug('🌐 Fallback lenguaje');
     }
 
     // 7. Agregar emoción empática si fue detectada (solo si no es respuesta de personalidad)

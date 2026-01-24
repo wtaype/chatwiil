@@ -1,12 +1,21 @@
 let conversationHistory = [];
 const MAX_MEMORY = 20; // Últimas 20 interacciones
 
+const toSafeString = (val) => {
+  if (typeof val === 'string') return val;
+  if (val === null || val === undefined) return '';
+  try { return String(val); } catch { return ''; }
+};
+
 // 💾 GUARDAR MENSAJE EN MEMORIA
 export const save = (message) => {
-  conversationHistory.push({
+  const safeMessage = {
     ...message,
+    content: toSafeString(message.content),
     timestamp: Date.now()
-  });
+  };
+
+  conversationHistory.push(safeMessage);
 
   // Mantener solo las últimas MAX_MEMORY
   if (conversationHistory.length > MAX_MEMORY) {
@@ -38,7 +47,7 @@ export const clear = () => {
 
 // 🎯 GENERAR RESPUESTA CON CONTEXTO
 export const generate = (userMessage) => {
-  const msg = userMessage.toLowerCase();
+  const msg = toSafeString(userMessage).toLowerCase();
   const recent = get(5);
   
   // Detectar referencias al contexto previo
