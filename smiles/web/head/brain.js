@@ -1,5 +1,107 @@
-import * as math from './math.js';import * as memoria from './memoria.js';import * as etica from './etica.js';import * as life from './life.js';import * as lenguaje from './lenguaje.js';import * as razonamiento from './razonamiento.js';import * as general from './general.js';import * as creatividad from './creatividad.js';import * as devs from './devs.js';import * as fe from './fe.js';import * as wiil from './wiil.js';
-const toStr=v=>typeof v==='string'?v:v==null?'':String(v);
-export const analyze=u=>{const msg=toStr(u).toLowerCase(),mods=[];if(/gracias|motivación|motívame|genial|increíble|mejor|lo máximo|cool|crack|top|pro|god|bacán|chévere|cómo estás|qué tal|adiós|chao|bye|feliz|te amo|me caes bien|hola|hey|buenas|qué onda|jaja|jeje|lol|xd/.test(msg))mods.push({name:'wiil',weight:0.99,module:wiil});if(/dios|jesús|biblia|verso|oración|fe|espiritual|cristo|señor|padre nuestro|amén/.test(msg))mods.push({name:'fe',weight:0.95,module:fe});if(/\d+|ecuación|resolver|calcular|matemática|geometría|álgebra|raíz|fracción|porcentaje/.test(msg))mods.push({name:'math',weight:0.9,module:math});if(/código|programar|javascript|python|html|css|función|variable|bug|error|develop/.test(msg))mods.push({name:'devs',weight:0.9,module:devs});if(/consejo|ayuda|cómo hacer|práctica|cotidiano|sentido común|realista|triste|solo|deprimido/.test(msg))mods.push({name:'life',weight:0.8,module:life});if(/historia|cuento|idea|inventa|creativo|metáfora|poema|canción|original/.test(msg))mods.push({name:'creatividad',weight:0.8,module:creatividad});if(/por qué|cómo funciona|explicar|razón|lógica|deducir|inferir|conclusión/.test(msg))mods.push({name:'razonamiento',weight:0.7,module:razonamiento});if(/historia|ciencia|cultura|quién|qué es|cuándo|dónde|país|planeta|guerra/.test(msg))mods.push({name:'general',weight:0.7,module:general});mods.push({name:'lenguaje',weight:0.1,module:lenguaje});mods.push({name:'etica',weight:0.3,module:etica});if(memoria.hasContext())mods.push({name:'memoria',weight:0.6,module:memoria});mods.sort((a,b)=>b.weight-a.weight);return mods};
-export const process=async userMessage=>{try{const userSafe=toStr(userMessage);memoria.save({role:'user',content:userSafe});const mods=analyze(userSafe);console.debug('🧠 Mods:',mods.map(m=>m.name));const ethics=etica.validate(userSafe);if(!ethics.safe){console.debug('🛡️ Ética:',ethics.reason);memoria.save({role:'assistant',content:ethics.response});return ethics.response;}const emotion=wiil.detectEmotion(userSafe);let response=null;for(const {name,module} of mods.slice(0,3)){try{const r=await module.generate(userSafe);console.debug(`↩️ ${name}:`,r);if(r&&typeof r==='string'){response=r;console.log(`✅ Respuesta generada por: ${name}`);break;}}catch(err){console.warn(`⚠️ ${name}:`,err);}}if(!response){response=lenguaje.generate(userSafe);console.debug('🌐 fallback lenguaje');}if(emotion&&!mods[0]?.name.includes('wiil'))response=`${emotion}<br><br>${response}`;if(!mods[0]?.name.includes('wiil'))response=wiil.addPersonality(response);memoria.save({role:'assistant',content:response});return response;}catch(err){console.error('❌ Brain.process:',err);return'😔 Disculpa, tuve un problema procesando tu mensaje. Pero estoy aquí para ti, intenta de nuevo. 💚';}}
-export {memoria};
+import * as memory from './memoria.js';
+
+// ========== SANITIZACIÓN HTML ==========
+const sanitize = (text) => {
+  if (typeof text !== 'string') return '';
+  
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML
+    .replace(/\n/g, '<br>')
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>');
+};
+
+// ========== PROCESAMIENTO PRINCIPAL ==========
+export const process = async (userMessage) => {
+  // Guardar mensaje del usuario
+  memory.add('user', userMessage);
+  
+  const msg = userMessage.toLowerCase().trim();
+  let response = '';
+  
+  // ========== MATEMÁTICAS ==========
+  if (/\d+\s*[\+\-\*\/]\s*\d+/.test(msg)) {
+    response = processMath(userMessage);
+  }
+  // ========== SALUDOS ==========
+  else if (/^(hola|hi|hey|buenas|que tal)/i.test(msg)) {
+    response = '¡Hola, amigo! 👋😊 ¿En qué puedo ayudarte hoy? 💚';
+  }
+  // ========== EMOCIONES ==========
+  else if (/(triste|deprimido|mal|solo|ansiedad)/i.test(msg)) {
+    response = '💙 Lamento que te sientas así. Recuerda que no estás solo. ¿Quieres hablar de lo que te preocupa? Estoy aquí para escucharte. 🤗';
+  }
+  // ========== AGRADECIMIENTOS ==========
+  else if (/(gracias|thank|agradezco)/i.test(msg)) {
+    response = '¡De nada! 🙏💚 Siempre es un placer ayudarte. ¿Algo más en lo que pueda asistirte?';
+  }
+  // ========== HALAGOS ==========
+  else if (/(genial|maximo|excelente|increible|crack|numero|number)/i.test(msg)) {
+    response = '¡Muchas gracias! 🙏💚 Pero el verdadero crack eres tú 🏆';
+  }
+  else if (/(te amo|te quiero|love you)/i.test(msg)) {
+    response = '¡Eres un amor! 💙 Muchas gracias, tú también eres espectacular 🌟✨';
+  }
+  // ========== BIBLIA ==========
+  else if (/(biblia|verso|dios|jesus|fe)/i.test(msg)) {
+    response = '✨ **"Porque de tal manera amó Dios al mundo..."** (Juan 3:16)\n\nLa fe es un camino personal. ¿Te gustaría explorar alguna enseñanza en particular?';
+  }
+  // ========== MENSAJES CORTOS (1-2 caracteres) ==========
+  else if (msg.length <= 2) {
+    response = '🤔 Hmm, no estoy seguro de cómo responder a eso. ¿Podrías reformular tu pregunta?';
+  }
+  // ========== RESPUESTA GENÉRICA ==========
+  else {
+    response = '💭 Interesante pregunta. ¿Podrías darme más detalles para ayudarte mejor?';
+  }
+  
+  // Agregar footer motivacional aleatorio
+  response += getMotivationalFooter();
+  
+  // Guardar respuesta en memoria
+  memory.add('assistant', response);
+  
+  // Retornar HTML sanitizado
+  return sanitize(response);
+};
+
+// ========== PROCESAMIENTO DE MATEMÁTICAS ==========
+const processMath = (expr) => {
+  try {
+    const match = expr.match(/(\d+)\s*([\+\-\*\/])\s*(\d+)/);
+    if (!match) return '❌ No pude entender la operación matemática';
+    
+    const [, a, op, b] = match;
+    const num1 = parseFloat(a);
+    const num2 = parseFloat(b);
+    let result;
+    
+    switch (op) {
+      case '+': result = num1 + num2; break;
+      case '-': result = num1 - num2; break;
+      case '*': result = num1 * num2; break;
+      case '/': result = num2 !== 0 ? num1 / num2 : 'Error: División por cero'; break;
+      default: result = 'Operación no válida';
+    }
+    
+    const symbol = { '+': '➕', '-': '➖', '*': '✖️', '/': '➗' }[op] || op;
+    
+    return `¡Súper! ⭐ Te va a encantar esto ${symbol}\n\n**Operación:**\n\n${num1} ${op} ${num2} = **${result}** ✅ 🎯`;
+  } catch (err) {
+    return '❌ Hubo un error al calcular. Verifica la operación.';
+  }
+};
+
+// ========== FOOTER MOTIVACIONAL ==========
+const getMotivationalFooter = () => {
+  const footers = [
+    '\n\n🕊️ *Espero haberte ayudado.* ✨',
+    '\n\n😊 *Que tengas un día maravilloso.* 🌈',
+    '\n\n🔥 *¡Tú puedes con todo!* 💯',
+    '\n\n💚 *Siempre a tu servicio.* 🙏',
+    ''
+  ];
+  
+  return footers[Math.floor(Math.random() * footers.length)];
+};
