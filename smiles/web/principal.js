@@ -69,6 +69,17 @@ export const init = () => {
   let autoScroll = true;
   const SCROLL_THRESHOLD = 120;
 
+  // Sanitizador básico para evitar que se renderice script/handlers en la respuesta
+  const sanitize = (txt) => {
+    if (typeof txt !== 'string') return '';
+    return txt
+      .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, '')
+      .replace(/\son\w+="[^"]*"/gi, '')
+      .replace(/\son\w+='[^']*'/gi, '')
+      .replace(/javascript:/gi, '')
+      .trim();
+  };
+
   // Detecta si el usuario se aleja del fondo para pausar auto-scroll
   $messages.on('scroll', function() {
     const distance = this.scrollHeight - this.scrollTop - this.clientHeight;
@@ -99,10 +110,13 @@ export const init = () => {
     addTypingIndicator();
 
     try {
-      const response = await brain.process(message);
+      const raw = await brain.process(message);
+      const response = sanitize(raw);
       removeTypingIndicator();
 
-      if (typeof response !== 'string') throw new Error('Respuesta no válida del cerebro');
+      if (typeof response !== 'string' || response.length === 0) {
+        throw new Error('Respuesta no válida del cerebro');
+      }
 
       typeWriterEffect(response, 'ai', () => { isTyping = false; });
     } catch (error) {
@@ -136,7 +150,8 @@ export const init = () => {
       ? '<i class="fas fa-user-circle"></i>' 
       : '<img src="/smile.avif" alt="ChatWiil" class="message_avatar_img">';
     const name = type === 'user' ? 'Tú' : 'ChatWiil';
-    const formattedText = type === 'user' ? text.replace(/\n/g, '<br>') : text;
+    const safe = type === 'user' ? text : sanitize(text);
+    const formattedText = type === 'user' ? safe.replace(/\n/g, '<br>') : safe;
 
     const messageHTML = `
       <div class="miia_message ${type}" data-time="${time}">
@@ -182,7 +197,8 @@ export const init = () => {
 
   // ========== EFECTO TYPEWRITER CON HTML (ID ÚNICO) ==========
   function typeWriterEffect(text, type, callback) {
-    if (typeof text !== 'string' || text.length === 0) {
+    const safeText = sanitize(text);
+    if (typeof safeText !== 'string' || safeText.length === 0) {
       console.error('❌ typeWriterEffect recibió texto inválido:', text);
       addMessage('🤔 Lo siento, hubo un error al generar la respuesta.', 'ai', true);
       if (callback) callback();
@@ -219,11 +235,11 @@ export const init = () => {
     const speed = 15;
 
     function type() {
-      if (i < text.length) {
-        if (text[i] === '<') {
-          const closingTag = text.indexOf('>', i);
+      if (i < safeText.length) {
+        if (safeText[i] === '<') {
+          const closingTag = safeText.indexOf('>', i);
           if (closingTag !== -1) {
-            const htmlTag = text.substring(i, closingTag + 1);
+            const htmlTag = safeText.substring(i, closingTag + 1);
             $typewriter.append(htmlTag);
             i = closingTag + 1;
             scrollToBottom();
@@ -231,7 +247,7 @@ export const init = () => {
             return;
           }
         }
-        $typewriter.append(text.charAt(i));
+        $typewriter.append(safeText.charAt(i));
         i++;
         scrollToBottom();
         setTimeout(type, speed);
