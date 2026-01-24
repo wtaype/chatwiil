@@ -1,77 +1,57 @@
-// 🌍 BASE DE CONOCIMIENTO
-const conocimiento = {
+// ========== PARTE 1: DATOS BASE ==========
+const conocimientos = {
   historia: {
-    'segunda guerra mundial': 'La Segunda Guerra Mundial (1939-1945) fue el conflicto bélico más grande de la historia, que involucró a la mayoría de las naciones del mundo.',
-    'independencia del perú': 'El Perú declaró su independencia el 28 de julio de 1821, proclamada por José de San Martín en Lima.',
-    'revolución francesa': 'La Revolución Francesa (1789-1799) fue un período de cambio social y político radical en Francia que tuvo un impacto duradero en el mundo.'
+    patron: /historia|histórico|pasado|guerra|antiguo/i,
+    respuestas: [
+      '📜 La historia nos enseña de dónde venimos. ¿Qué época te interesa: antigua, medieval, moderna?',
+      '⏳ Cada civilización dejó su huella. ¿Quieres saber sobre Egipto, Roma, Incas, o alguna otra?',
+      '🏛️ La historia está llena de lecciones. ¿Algún evento o personaje en particular?'
+    ]
   },
   ciencia: {
-    'gravedad': 'La gravedad es la fuerza que atrae los objetos con masa. En la Tierra, nos mantiene pegados al suelo.',
-    'fotosíntesis': 'La fotosíntesis es el proceso por el cual las plantas convierten la luz solar, agua y CO₂ en energía (glucosa) y oxígeno.',
-    'adn': 'El ADN (ácido desoxirribonucleico) es la molécula que contiene las instrucciones genéticas de todos los seres vivos.'
+    patron: /ciencia|científico|física|química|biología/i,
+    respuestas: [
+      '🔬 La ciencia explica el mundo. ¿Te interesa física, química, biología o astronomía?',
+      '⚗️ Desde el átomo hasta las galaxias. ¿Qué tema científico quieres explorar?',
+      '🧬 La ciencia avanza cada día. ¿Algún descubrimiento reciente que te intrigue?'
+    ]
   },
   geografia: {
-    'everest': 'El Monte Everest es la montaña más alta del mundo, con 8,849 metros de altura, ubicada en el Himalaya.',
-    'amazonas': 'El río Amazonas es el más caudaloso del mundo y el segundo más largo, ubicado en Sudamérica.',
-    'perú': 'Perú es un país de Sudamérica, conocido por Machu Picchu, su rica historia inca y su diversidad natural.'
+    patron: /geografía|país|continente|ciudad|lugar/i,
+    respuestas: [
+      '🌍 Nuestro planeta es fascinante. ¿Quieres saber sobre países, continentes o lugares específicos?',
+      '🗺️ Cada lugar tiene su historia. ¿Algún destino en particular que te interese?',
+      '⛰️ Montañas, océanos, desiertos... ¿Qué quieres conocer?'
+    ]
+  },
+  cultura: {
+    patron: /cultura|tradición|costumbre|arte|música/i,
+    respuestas: [
+      '🎭 La cultura nos define. ¿Te interesa arte, música, literatura o tradiciones?',
+      '🎨 Cada cultura tiene su belleza. ¿Alguna cultura en particular que quieras explorar?',
+      '🎵 Desde el arte hasta la música. ¿Qué aspecto cultural te atrae más?'
+    ]
+  },
+  tecnologia: {
+    patron: /tecnología|tech|innovación|futuro|ai/i,
+    respuestas: [
+      '🤖 La tecnología cambia el mundo. ¿Te interesa IA, robótica, internet o gadgets?',
+      '💻 Desde smartphones hasta IA. ¿Qué tecnología quieres conocer mejor?',
+      '🚀 El futuro es ahora. ¿Alguna innovación tecnológica que te fascine?'
+    ]
   }
 };
 
-// 🎯 GENERAR RESPUESTA
+// ========== PARTE 2: HELPERS ==========
+const random = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
+// ========== PARTE 3: PROCESAMIENTO ==========
 export const generate = (userMessage) => {
   const msg = userMessage.toLowerCase();
-
-  // ========== HISTORIA ==========
-  if (/historia|guerra|independencia|revolución/i.test(msg)) {
-    for (const [key, value] of Object.entries(conocimiento.historia)) {
-      if (msg.includes(key)) {
-        return `📜 **Historia:**\n\n${value}\n\n💡 ¿Quieres saber más sobre este tema?`;
-      }
-    }
+  
+  for (const [key, tema] of Object.entries(conocimientos)) {
+    if (tema.patron.test(msg)) return random(tema.respuestas);
   }
-
-  // ========== CIENCIA ==========
-  if (/ciencia|científico|gravedad|fotosíntesis|adn|átomo|célula/i.test(msg)) {
-    for (const [key, value] of Object.entries(conocimiento.ciencia)) {
-      if (msg.includes(key)) {
-        return `🔬 **Ciencia:**\n\n${value}\n\n💡 ¿Te gustaría profundizar en este concepto?`;
-      }
-    }
-
-    // Respuesta genérica de ciencia
-    return `🔬 **La ciencia es fascinante.**\n\n` +
-           `Puedo ayudarte con conceptos de:\n` +
-           `• Física (gravedad, energía, movimiento)\n` +
-           `• Química (átomos, moléculas, reacciones)\n` +
-           `• Biología (células, ADN, fotosíntesis)\n\n` +
-           `¿Sobre qué tema específico quieres aprender?`;
-  }
-
-  // ========== GEOGRAFÍA ==========
-  if (/dónde está|dónde queda|país|ciudad|montaña|río/i.test(msg)) {
-    for (const [key, value] of Object.entries(conocimiento.geografia)) {
-      if (msg.includes(key)) {
-        return `🌍 **Geografía:**\n\n${value}\n\n💡 ¿Quieres saber más sobre lugares del mundo?`;
-      }
-    }
-  }
-
-  // ========== CULTURA GENERAL ==========
-  if (/quién fue|quién es|qué es|cuál es/i.test(msg)) {
-    if (/albert einstein/i.test(msg)) {
-      return `🧠 **Albert Einstein (1879-1955)**\n\n` +
-             `Fue un físico alemán, autor de la teoría de la relatividad (E=mc²).\n` +
-             `Ganó el Premio Nobel de Física en 1921.\n\n` +
-             `💡 Frase famosa: "La imaginación es más importante que el conocimiento."`;
-    }
-
-    if (/leonardo da vinci/i.test(msg)) {
-      return `🎨 **Leonardo da Vinci (1452-1519)**\n\n` +
-             `Fue un genio renacentista: pintor, inventor, científico.\n` +
-             `Obras famosas: La Mona Lisa, La Última Cena.\n\n` +
-             `💡 Un verdadero hombre del Renacimiento: arte, ciencia y filosofía.`;
-    }
-  }
-
+  
   return null;
 };

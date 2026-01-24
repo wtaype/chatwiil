@@ -1,8 +1,8 @@
 import './principal.css';
 import $ from 'jquery';
 import { version } from '../wii.js';
-import * as brain from './head/brain.js';
-import * as memory from './head/memoria.js';
+import * as brain from './brain.js';
+import * as memoria from './memoria.js';
 
 export const render = () => `
 <div class="miia">
@@ -47,52 +47,45 @@ export const render = () => `
 </div>`;
 
 // ==================== PARTE 1: ESTADO Y UTILIDADES ====================
-let isTyping = false;
-let messageCounter = 0;
-
-const getElements = () => ({ $messages: $('#miiaMessages'), $input: $('#miiaInput'), $sendBtn: $('#miiaSend') });
-
-const scrollToBottom = (smooth = false) => {
-  const { $messages } = getElements();
-  if (!$messages.length) return;
-  const container = $messages[0];
-  smooth ? container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' })
-         : container.scrollTop = container.scrollHeight;
+let escribiendo = false, contador = 0;
+const obtenerEl = () => ({ $msg: $('#miiaMessages'), $inp: $('#miiaInput'), $btn: $('#miiaSend') });
+const desplazar = (suave = false) => {
+  const { $msg } = obtenerEl();
+  if (!$msg.length) return;
+  const c = $msg[0];
+  suave ? c.scrollTo({ top: c.scrollHeight, behavior: 'smooth' }) : c.scrollTop = c.scrollHeight;
 };
 
 // ==================== PARTE 2: MENSAJES Y EFECTOS ====================
-const addMessage = (text, type) => {
-  const { $messages } = getElements();
-  const time = new Date().toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' });
-  const avatar = type === 'user' ? '<i class="fas fa-user-circle"></i>' : '<img src="/smile.avif" alt="ChatWiil" class="message_avatar_img">';
-  const name = type === 'user' ? 'Tú' : 'ChatWiil';
+const agregarMsg = (texto, tipo) => {
+  const { $msg } = obtenerEl();
+  const hora = new Date().toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' });
+  const avatar = tipo === 'user' ? '<i class="fas fa-user-circle"></i>' : '<img src="/smile.avif" alt="ChatWiil" class="message_avatar_img">';
+  const nombre = tipo === 'user' ? 'Tú' : 'ChatWiil';
   
-  const $msg = $(`
-    <div class="miia_message ${type}" data-time="${time}">
+  const $m = $(`
+    <div class="miia_message ${tipo}" data-time="${hora}">
       <div class="message_avatar">${avatar}</div>
       <div class="message_content">
         <div class="message_header">
-          <span class="message_name">${name}</span>
-          <span class="message_time">${time}</span>
+          <span class="message_name">${nombre}</span>
+          <span class="message_time">${hora}</span>
         </div>
         <div class="message_text"></div>
       </div>
     </div>
   `);
   
-  const $textEl = $msg.find('.message_text');
-  type === 'user' ? $textEl.text(text) : $textEl.html(text);
-  
-  $messages.append($msg);
-  scrollToBottom();
+  $m.find('.message_text').text(texto);
+  $msg.append($m);
+  desplazar();
 };
 
-const toggleTypingIndicator = (show) => {
-  const { $messages } = getElements();
+const mostrarEscribiendo = (mostrar) => {
+  const { $msg } = obtenerEl();
   $('.miia_message.typing').remove();
-  
-  if (show) {
-    $messages.append(`
+  if (mostrar) {
+    $msg.append(`
       <div class="miia_message ai typing">
         <div class="message_avatar"><img src="/smile.avif" alt="ChatWiil" class="message_avatar_img"></div>
         <div class="message_content">
@@ -100,129 +93,108 @@ const toggleTypingIndicator = (show) => {
         </div>
       </div>
     `);
-    scrollToBottom();
+    desplazar();
   }
 };
 
-const typeWriterEffect = (htmlContent, callback) => {
-  const { $messages } = getElements();
-  const time = new Date().toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' });
-  const id = `typewriter_${Date.now()}_${++messageCounter}`;
+const escribirTexto = (contenido, callback) => {
+  const { $msg } = obtenerEl();
+  const hora = new Date().toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' });
+  const id = `tw_${Date.now()}_${++contador}`;
   
-  const $msg = $(`
-    <div class="miia_message ai" data-time="${time}">
+  $msg.append(`
+    <div class="miia_message ai" data-time="${hora}">
       <div class="message_avatar"><img src="/smile.avif" alt="ChatWiil" class="message_avatar_img"></div>
       <div class="message_content">
         <div class="message_header">
           <span class="message_name">ChatWiil</span>
-          <span class="message_time">${time}</span>
+          <span class="message_time">${hora}</span>
         </div>
         <div class="message_text" id="${id}"></div>
       </div>
     </div>
   `);
   
-  $messages.append($msg);
-  scrollToBottom();
+  desplazar();
   
-  const $textEl = $(`#${id}`);
-  const temp = $('<div>').html(htmlContent);
-  const text = temp.text();
-  const html = temp.html();
+  const $el = $(`#${id}`);
+  const texto = contenido.replace(/\n/g, ' ');
   
-  let index = 0;
-  let lastScrollTime = 0;
-  const speed = 15;
-  const scrollInterval = 100; // Solo hacer scroll cada 100ms
+  let idx = 0, ultimoScroll = 0;
+  const velocidad = 15, intervaloScroll = 100;
   
-  const type = () => {
-    if (index < text.length) {
-      let displayHTML = '';
-      let textCount = 0;
-      let insideTag = false;
+  const escribir = () => {
+    if (idx < texto.length) {
+      $el.text(texto.substring(0, idx + 1));
+      idx++;
       
-      for (let i = 0; i < html.length; i++) {
-        const char = html[i];
-        if (char === '<') insideTag = true;
-        displayHTML += char;
-        if (char === '>') { insideTag = false; continue; }
-        if (!insideTag && char !== '<' && char !== '>') {
-          textCount++;
-          if (textCount >= index + 1) break;
-        }
+      const ahora = Date.now();
+      if (ahora - ultimoScroll > intervaloScroll) {
+        desplazar();
+        ultimoScroll = ahora;
       }
       
-      $textEl.html(displayHTML);
-      index++;
-      
-      // Scroll optimizado: solo cada 100ms
-      const now = Date.now();
-      if (now - lastScrollTime > scrollInterval) {
-        scrollToBottom();
-        lastScrollTime = now;
-      }
-      
-      setTimeout(type, speed);
+      setTimeout(escribir, velocidad);
     } else {
-      $textEl.html(html).removeAttr('id');
-      scrollToBottom(true);
-      if (callback) callback();
+      $el.removeAttr('id');
+      desplazar(true);
+      callback && callback();
     }
   };
   
-  type();
+  escribir();
 };
 
 // ==================== PARTE 3: EVENTOS Y CONTROL ====================
-const sendMessage = async () => {
-  const { $input } = getElements();
-  const message = $input.val().trim();
+const enviarMsg = async () => {
+  const { $inp } = obtenerEl();
+  const msg = $inp.val().trim();
   
-  if (!message || isTyping) return;
+  if (!msg || escribiendo) return;
   
   $('.miia_empty').fadeOut(200, function() { $(this).remove(); });
-  addMessage(message, 'user');
-  $input.val('').css('height', 'auto').trigger('input');
+  agregarMsg(msg, 'user');
+  $inp.val('').css('height', 'auto').trigger('input');
   
-  isTyping = true;
-  toggleTypingIndicator(true);
+  escribiendo = true;
+  mostrarEscribiendo(true);
   
   try {
-    const response = await brain.process(message);
-    toggleTypingIndicator(false);
-    if (!response || typeof response !== 'string') throw new Error('Respuesta inválida');
-    typeWriterEffect(response, () => isTyping = false);
+    const res = await brain.procesar(msg);
+    mostrarEscribiendo(false);
+    if (!res || typeof res !== 'string') throw new Error('Respuesta inválida');
+    escribirTexto(res, () => escribiendo = false);
   } catch (err) {
-    console.error('❌ Error procesando mensaje:', err);
-    toggleTypingIndicator(false);
-    addMessage('😔 Disculpa, tuve un problema procesando tu mensaje. Por favor, intenta de nuevo. 💚', 'ai');
-    isTyping = false;
+    console.error('❌ Error:', err);
+    mostrarEscribiendo(false);
+    agregarMsg('😔 Disculpa, tuve un problema. Por favor, intenta de nuevo. 💚', 'ai');
+    escribiendo = false;
   }
 };
 
 export const init = () => {
-  const { $input, $sendBtn } = getElements();
+  const { $inp, $btn } = obtenerEl();
   
-  $input.on('input', function() {
+  $inp.on('input', function() {
     this.style.height = 'auto';
     this.style.height = Math.min(this.scrollHeight, 120) + 'px';
-    const hasText = $(this).val().trim().length > 0;
-    $sendBtn.prop('disabled', !hasText).toggleClass('active', hasText);
+    const tieneTxt = $(this).val().trim().length > 0;
+    $btn.prop('disabled', !tieneTxt).toggleClass('active', tieneTxt);
   });
   
-  $input.on('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } });
-  $sendBtn.on('click', sendMessage);
+  $inp.on('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); enviarMsg(); } });
+  $btn.on('click', enviarMsg);
   $(document).on('click', '.suggestion_card', function() {
-    $input.val($(this).data('prompt')).css('height', 'auto').trigger('input').focus();
+    $inp.val($(this).data('prompt')).css('height', 'auto').trigger('input').focus();
   });
   
-  memory.loadHistory();
+  memoria.loadHistory();
   console.log(`✅ ChatWiil IA ${version} iniciado`);
 };
 
 export const cleanup = () => {
   $('#miiaInput, #miiaSend').off();
   $(document).off('click', '.suggestion_card');
-  memory.clear();
+  memoria.clear();
   console.log('🧹 ChatWiil IA limpiado');
 };
