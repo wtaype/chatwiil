@@ -1,4 +1,4 @@
-import './inicio.css';
+import './principal.css';
 import $ from 'jquery';
 import { app, version } from '../wii.js';
 import * as brain from './head/brain.js';
@@ -65,15 +65,21 @@ export const init = () => {
   const $input = $('#miiaInput');
   const $sendBtn = $('#miiaSend');
   let isTyping = false;
-  let messageCounter = 0; // ✅ Contador único para IDs
+  let messageCounter = 0;
+  let autoScroll = true;
+  const SCROLL_THRESHOLD = 120;
+
+  // Detecta si el usuario se aleja del fondo para pausar auto-scroll
+  $messages.on('scroll', function() {
+    const distance = this.scrollHeight - this.scrollTop - this.clientHeight;
+    autoScroll = distance <= SCROLL_THRESHOLD;
+  });
 
   // ========== AUTO-RESIZE TEXTAREA (SIN SCROLL) ==========
   $input.on('input', function() {
     this.style.height = 'auto';
     const newHeight = Math.min(this.scrollHeight, 120);
     this.style.height = newHeight + 'px';
-    
-    // Habilitar/deshabilitar botón de envío
     const hasText = $(this).val().trim().length > 0;
     $sendBtn.prop('disabled', !hasText);
     $sendBtn.toggleClass('active', hasText);
@@ -84,42 +90,29 @@ export const init = () => {
     const message = $input.val().trim();
     if (!message || isTyping) return;
 
-    // Limpiar empty state si existe
     $('.miia_empty').fadeOut(300, function() { $(this).remove(); });
 
-    // Agregar mensaje del usuario
-    addMessage(message, 'user');
-    
-    // Limpiar input
+    addMessage(message, 'user', true);
     $input.val('').css('height', 'auto').trigger('input');
 
-    // Procesar con el cerebro
     isTyping = true;
     addTypingIndicator();
-    
+
     try {
-      // 🧠 USAR EL CEREBRO PARA PROCESAR
       const response = await brain.process(message);
-      
       removeTypingIndicator();
-      
-      // ✅ Verificar que sea string válido
-      if (typeof response !== 'string') {
-        throw new Error('Respuesta no válida del cerebro');
-      }
-      
-      typeWriterEffect(response, 'ai', () => {
-        isTyping = false;
-      });
+
+      if (typeof response !== 'string') throw new Error('Respuesta no válida del cerebro');
+
+      typeWriterEffect(response, 'ai', () => { isTyping = false; });
     } catch (error) {
       console.error('❌ Error procesando mensaje:', error);
       removeTypingIndicator();
-      addMessage('😔 Disculpa, tuve un problema procesando tu mensaje. Por favor, intenta de nuevo. 💚', 'ai');
+      addMessage('😔 Disculpa, tuve un problema procesando tu mensaje. Por favor, intenta de nuevo. 💚', 'ai', true);
       isTyping = false;
     }
   };
 
-  // Enter para enviar (Shift+Enter para nueva línea)
   $input.on('keydown', (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -137,14 +130,12 @@ export const init = () => {
   });
 
   // ========== AGREGAR MENSAJE ==========
-  function addMessage(text, type) {
+  function addMessage(text, type, force = false) {
     const time = new Date().toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' });
     const avatar = type === 'user' 
       ? '<i class="fas fa-user-circle"></i>' 
       : '<img src="/smile.avif" alt="ChatWiil" class="message_avatar_img">';
     const name = type === 'user' ? 'Tú' : 'ChatWiil';
-
-    // Convertir saltos de línea a <br> para mensajes de usuario
     const formattedText = type === 'user' ? text.replace(/\n/g, '<br>') : text;
 
     const messageHTML = `
@@ -161,14 +152,12 @@ export const init = () => {
     `;
 
     $messages.append(messageHTML);
-    scrollToBottom();
+    scrollToBottom(force);
   }
 
   // ========== TYPING INDICATOR ==========
   function addTypingIndicator() {
-    // ✅ Eliminar indicadores previos
     removeTypingIndicator();
-    
     const typingHTML = `
       <div class="miia_message ai typing">
         <div class="message_avatar">
@@ -193,20 +182,17 @@ export const init = () => {
 
   // ========== EFECTO TYPEWRITER CON HTML (ID ÚNICO) ==========
   function typeWriterEffect(text, type, callback) {
-    // ✅ Validación estricta del texto
     if (typeof text !== 'string' || text.length === 0) {
       console.error('❌ typeWriterEffect recibió texto inválido:', text);
-      addMessage('🤔 Lo siento, hubo un error al generar la respuesta.', 'ai');
+      addMessage('🤔 Lo siento, hubo un error al generar la respuesta.', 'ai', true);
       if (callback) callback();
       return;
     }
 
     const time = new Date().toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' });
     const avatar = '<img src="/smile.avif" alt="ChatWiil" class="message_avatar_img">';
-    
-    // ✅ ID ÚNICO para cada mensaje (evita duplicados en producción)
     const uniqueId = `typewriter_${Date.now()}_${++messageCounter}`;
-    
+
     const messageHTML = `
       <div class="miia_message ${type}" data-time="${time}">
         <div class="message_avatar">${avatar}</div>
@@ -222,20 +208,18 @@ export const init = () => {
 
     $messages.append(messageHTML);
     const $typewriter = $(`#${uniqueId}`);
-    
-    // ✅ Verificar que el elemento existe
+
     if ($typewriter.length === 0) {
       console.error('❌ No se encontró el elemento typewriter con ID:', uniqueId);
       if (callback) callback();
       return;
     }
-    
+
     let i = 0;
     const speed = 15;
-    
+
     function type() {
       if (i < text.length) {
-        // Si el siguiente carácter es '<', procesar toda la etiqueta HTML
         if (text[i] === '<') {
           const closingTag = text.indexOf('>', i);
           if (closingTag !== -1) {
@@ -247,25 +231,24 @@ export const init = () => {
             return;
           }
         }
-        
-        // Agregar carácter normal
         $typewriter.append(text.charAt(i));
         i++;
         scrollToBottom();
         setTimeout(type, speed);
       } else {
-        // ✅ Remover ID al terminar
         $typewriter.removeAttr('id');
         if (callback) callback();
       }
     }
-    
+
+    scrollToBottom(); // asegura foco inicial en la nueva respuesta
     type();
   }
 
   // ========== SCROLL TO BOTTOM ==========
-  function scrollToBottom() {
-    $messages.animate({ scrollTop: $messages[0].scrollHeight }, 300);
+  function scrollToBottom(force = false) {
+    if (!force && !autoScroll) return;
+    $messages.stop(true).animate({ scrollTop: $messages[0].scrollHeight }, 200);
   }
 
   console.log(`✅ ChatWiil IA ${version} iniciado con 🧠 Brain System + 🎭 Personalidad`);
