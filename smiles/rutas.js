@@ -18,14 +18,15 @@ export const NAV = {
   smile: {
     nvleft: [
       { href: '/smile', page: 'smile', ico: 'fa-house', txt: 'Dashboard' },
-      { href: '/win',   page: 'win',   ico: 'fa-file-word', txt: 'Win Editor' },
+      { href: '/enviar', page: 'enviar', ico: 'fa-paper-plane', txt: 'Enviar' },
       { href: '/more',  page: 'more',  ico: 'fa-ellipsis', txt: 'Más' }
     ],
     nvright: [
       { isPerfil: true }, { isSalir: true }
     ],
     more: [
-      { href: '/perfil', ico: 'fa-user', txt: 'Mi Perfil', desc: 'Edita tus datos personales y tema visual.' }
+      { href: '/perfil', ico: 'fa-user', txt: 'Mi Perfil', desc: 'Edita tus datos personales y tema visual.' },
+      { href: '/win',   page: 'win',   ico: 'fa-file-word', txt: 'Win Editor' },
     ]
   },
   gestor: {
@@ -82,6 +83,7 @@ export const RUTAS = Object.entries({
 
   // Autenticadas comunes (objeto define 'area' y 'roles')
   '/smile': { area: 'smile', roles: ['smile', 'gestor', 'admin'] },
+  '/enviar': { area: 'smile', roles: ['smile', 'gestor', 'admin'] },
   '/perfil': { area: 'smile', roles: ['smile', 'gestor', 'admin'] },
   '/more': { area: 'smile', roles: ['smile', 'gestor', 'admin'] },
   '/win': { area: 'smile', roles: ['smile', 'gestor', 'admin'] },
