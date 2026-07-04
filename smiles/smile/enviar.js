@@ -9,14 +9,20 @@ import { wiAuth, Mensaje } from '../widev/widev.js';
 
 // ── Sugerencias rápidas ──────────────────────────────────────────────────────
 const SUGS = [
-  'continúa',
+  // 1. Oídos (Prioridad 1)
+  'escucha 10s',
+  'escucha 20s',
+  'graba 30s',
+  // 2. Ojos (Prioridad 2)
+  'captura pantalla',
+  'captura imagen',
+  // 3. Manos / Texto (Prioridad 3)
+  'revisa pantalla',
+  'revisa',
+  'continua',
+  // 4. Gracias / Cierre (Prioridad 4)
   'muchas gracias',
-  'siguiente',
-  'Revisa la pantalla',
-  'Mira mi pantalla',
-  'Escucha el audio',
-  'Explica en más detalle',
-  '¿Qué debo hacer ahora?',
+  'siguiente'
 ];
 
 // ── Estado local ─────────────────────────────────────────────────────────────
@@ -107,14 +113,7 @@ export const init = () => {
     if (btnSend) btnSend.disabled = len === 0 || _enviando;
   });
 
-  // ── Sugerencias rápidas ──────────────────────────────────────────────────
-  sugsGrid?.addEventListener('click', (e) => {
-    const chip = e.target.closest('.env_chip');
-    if (!chip || !textarea) return;
-    textarea.value = chip.dataset.msg;
-    textarea.dispatchEvent(new Event('input'));
-    textarea.focus();
-  });
+
 
   // ── Enviar ───────────────────────────────────────────────────────────────
   const _enviar = async () => {
@@ -174,6 +173,22 @@ export const init = () => {
   };
 
   btnSend?.addEventListener('click', _enviar);
+
+  // ── Sugerencias rápidas con auto-envío inteligente ────────────────────────
+  sugsGrid?.addEventListener('click', async (e) => {
+    const chip = e.target.closest('.env_chip');
+    if (!chip || !textarea || _enviando) return;
+    const msg = chip.dataset.msg;
+    textarea.value = msg;
+    textarea.dispatchEvent(new Event('input'));
+    textarea.focus();
+
+    // No auto-enviar si requiere edición (contiene palabras de CONTROLWII)
+    const requiereEdicion = /\b(escucha|graba|audio|captura)\b/i.test(msg);
+    if (!requiereEdicion) {
+      await _enviar();
+    }
+  });
 
   // Enviar con Enter directo (y Shift+Enter para salto de línea)
   textarea?.addEventListener('keydown', (e) => {
