@@ -10,12 +10,11 @@ import { wiAuth, Mensaje } from '../widev/widev.js';
 // ── Sugerencias rápidas ──────────────────────────────────────────────────────
 const SUGS = [
   'continúa',
-  'Revisa la pantalla actual',
+  'muchas gracias',
+  'siguiente',
+  'Revisa la pantalla',
   'Explica en más detalle',
-  '¿Cuál es el siguiente paso?',
-  'Dame un ejemplo práctico',
-  'Simplifica la respuesta',
-  'Haz una pausa y resume lo que llevamos',
+  'Dame un ejemplo',
   '¿Qué debo hacer ahora?',
 ];
 
@@ -189,9 +188,9 @@ export const init = () => {
 
   btnSend?.addEventListener('click', _enviar);
 
-  // Enviar con Ctrl+Enter o Cmd+Enter
+  // Enviar con Enter directo (y Shift+Enter para salto de línea)
   textarea?.addEventListener('keydown', (e) => {
-    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+    if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       _enviar();
     }
