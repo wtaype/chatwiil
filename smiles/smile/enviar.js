@@ -1,10 +1,10 @@
 // smiles/smile/enviar.js
 // ChatWii Remote — Página de envío de mensajes desde chatwii-web
-// Escribe en Firestore colección "parati" / doc {uid}
+// Escribe en Realtime Database ruta "parati/{uid}"
 
 import './enviar.css';
-import { db } from '../firebase.js';
-import { doc, setDoc, serverTimestamp, onSnapshot } from 'firebase/firestore';
+import { rtdb } from '../firebase.js';
+import { ref as dbRef, set as dbSet, onValue } from 'firebase/database';
 import { wiAuth, Mensaje } from '../widev/widev.js';
 
 // ── Sugerencias rápidas ──────────────────────────────────────────────────────
@@ -13,44 +13,31 @@ const SUGS = [
   'muchas gracias',
   'siguiente',
   'Revisa la pantalla',
+  'Mira mi pantalla',
+  'Escucha el audio',
   'Explica en más detalle',
-  'Dame un ejemplo',
   '¿Qué debo hacer ahora?',
 ];
 
 // ── Estado local ─────────────────────────────────────────────────────────────
 let _enviando  = false;
-let _unsubConf = null;      // listener de confirmación (cuando el doc se borra = recibido)
+let _unsubConf = null;      // listener de confirmación (cuando el nodo se borra = recibido)
 const _historial = [];
 
 // ── render ───────────────────────────────────────────────────────────────────
 export const render = () => {
-  const chips = SUGS.map(s =>
+  const chips = SUGS.map(s => 
     `<button class="env_chip" data-msg="${s}">${s}</button>`
   ).join('');
 
   return `
     <div class="env_wrap">
 
-      <!-- Hero -->
-      <div class="env_hero wi_fadeUp">
-        <div class="env_hero_icon">
-          <i class="fas fa-satellite-dish"></i>
-        </div>
-        <div class="env_hero_info">
-          <p class="env_hero_title">ChatWii Remote</p>
-          <span class="env_hero_sub">
-            <span class="env_status_dot"></span>
-            <span id="envStatusLabel">Listo para enviar</span>
-          </span>
-        </div>
-      </div>
-
       <!-- Compose -->
       <div class="env_compose wi_fadeUp">
         <p class="env_compose_label">
-          <i class="fas fa-pen-to-square"></i>
-          Escribe tu mensaje de apoyo
+          <span><i class="fas fa-pen-to-square"></i> Escribe tu mensaje de apoyo</span>
+          <span id="envStatusLabel" class="env_status_lbl">Listo para enviar</span>
         </p>
         <textarea
           class="env_textarea"
@@ -141,13 +128,13 @@ export const init = () => {
     if (statusLbl) statusLbl.textContent = 'Enviando...';
 
     try {
-      const ref = doc(db, 'parati', uid);
-      await setDoc(ref, { texto, creado: serverTimestamp() });
+      const nodeRef = dbRef(rtdb, 'parati/' + uid);
+      await dbSet(nodeRef, { texto, creado: Date.now() });
 
-      // Escuchar confirmación: el doc desaparece cuando la extensión lo procesa
+      // Escuchar confirmación: el nodo se borra cuando la extensión lo recibe
       if (_unsubConf) _unsubConf();
-      _unsubConf = onSnapshot(ref, (snap) => {
-        if (!snap.exists()) {
+      _unsubConf = onValue(nodeRef, (snapshot) => {
+        if (!snapshot.exists()) {
           // Recibido por la extensión ✓
           if (statusLbl) statusLbl.textContent = '✓ Recibido por la extensión';
           if (_unsubConf) { _unsubConf(); _unsubConf = null; }
