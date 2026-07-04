@@ -1,0 +1,248 @@
+/* ==========================================================================
+   MORE.CSS - Hub de Más Herramientas Premium (Estilo Cuadros/Tarjetas)
+   ========================================================================== */
+
+.z_wrap {
+  width: 100%;
+  padding: 2vh 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3.5vh;
+  animation: z_page_fade 0.5s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+@keyframes z_page_fade {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── HEADER ── */
+.z_header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 3vh;
+  background: var(--wb) !important;
+  border: 1px solid var(--brd) !important;
+  border-radius: 2.5vh !important;
+  padding: 3vh 4vw !important;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--bs_l) !important;
+}
+
+.z_header::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 6px;
+  background: linear-gradient(90deg, var(--mco), var(--hv, #7C3AED));
+  z-index: 10;
+}
+
+.z_header_txt h1 {
+  font-family: var(--ff_O);
+  font-size: var(--fz_l1);
+  font-weight: 800;
+  color: var(--tx);
+  letter-spacing: -1px;
+}
+
+.z_header_txt p {
+  font-size: var(--fz_s2);
+  color: var(--tx3);
+  font-weight: 600;
+  margin-top: 0.6vh;
+}
+
+.z_badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 1vh;
+  padding: 0.6vh 1.4vh;
+  background: color-mix(in srgb, var(--mco) 8%, var(--bg));
+  border: 1px solid color-mix(in srgb, var(--mco) 15%, var(--brd));
+  color: var(--mco);
+  font-weight: 800;
+  border-radius: 50px;
+  font-size: var(--fz_s4);
+  font-family: var(--ff_O);
+  margin-bottom: 1.2vh;
+}
+
+/* ── SEARCH BOX ── */
+.z_search_box {
+  position: relative;
+  width: 320px;
+}
+
+.z_search_box i {
+  position: absolute;
+  left: 2vh;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--tx3);
+  font-size: var(--fz_m2);
+  pointer-events: none;
+}
+
+.z_search_box input {
+  width: 100%;
+  height: 48px;
+  padding: 0 2vh 0 5.5vh;
+  background: var(--bg) !important;
+  border: 1px solid var(--brd) !important;
+  border-radius: 50px !important;
+  color: var(--tx) !important;
+  font-size: var(--fz_s3) !important;
+  font-weight: 600 !important;
+  transition: all var(--tr_m);
+}
+
+.z_search_box input:focus {
+  background: var(--wb) !important;
+  border-color: var(--mco) !important;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--mco) 12%, transparent) !important;
+}
+
+/* ── GRID DE TARJETAS ── */
+.z_grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 3.5vh;
+  width: 100%;
+}
+
+.z_card {
+  background: var(--wb) !important;
+  border: 1px solid var(--brd) !important;
+  border-radius: 2.5vh !important;
+  padding: 3vh !important;
+  text-decoration: none !important;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--bs_l) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  min-height: 16vh;
+}
+
+.z_card_bar {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 6px;
+  background: var(--brd);
+  transition: all 0.3s ease;
+}
+
+.z_card:hover .z_card_bar {
+  background: var(--mco);
+  width: 8px;
+}
+
+.z_card_top {
+  display: flex;
+  gap: 2.5vh;
+  align-items: flex-start;
+  height: 100%;
+}
+
+.z_card_ico {
+  width: 6vh;
+  height: 6vh;
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 1.5vh;
+  background: var(--bg);
+  border: 1px solid var(--brd);
+  color: var(--tx2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--fz_m1);
+  transition: all 0.3s ease;
+  box-shadow: var(--bs_m);
+}
+
+.z_card:hover .z_card_ico {
+  background: color-mix(in srgb, var(--mco) 10%, var(--wb));
+  border-color: color-mix(in srgb, var(--mco) 20%, transparent);
+  color: var(--mco);
+  transform: scale(1.08) rotate(-5deg);
+}
+
+.z_card_body {
+  flex: 1;
+}
+
+.z_card_body h3 {
+  font-family: var(--ff_O);
+  font-size: var(--fz_m2);
+  font-weight: 800;
+  color: var(--tx);
+  letter-spacing: -0.3px;
+  margin-bottom: 0.6vh;
+}
+
+.z_card_body p {
+  font-size: var(--fz_s4);
+  color: var(--tx3);
+  line-height: 1.4;
+  font-weight: 500;
+}
+
+.z_card_arrow {
+  font-size: var(--fz_s3);
+  color: var(--brd);
+  margin-top: 1.5vh;
+  transition: all 0.3s ease;
+}
+
+.z_card:hover .z_card_arrow {
+  color: var(--mco);
+  transform: translateX(4px);
+}
+
+.z_card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 30px -5px color-mix(in srgb, var(--mco) 8%, rgba(0,0,0,0.04)), 0 8px 15px -8px color-mix(in srgb, var(--mco) 12%, rgba(0,0,0,0.06)) !important;
+  border-color: color-mix(in srgb, var(--mco) 15%, var(--brd)) !important;
+}
+
+/* Empty State */
+.z_empty_grid {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 10vh 0;
+  color: var(--tx3);
+  font-size: var(--fz_m2);
+  font-weight: 600;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2vh;
+}
+
+.z_empty_grid i {
+  font-size: 5vh;
+  color: var(--brd);
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  .z_header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 3vh !important;
+  }
+  
+  .z_search_box {
+    width: 100%;
+  }
+  
+  .z_grid {
+    grid-template-columns: 1fr;
+    gap: 2.5vh;
+  }
+}
