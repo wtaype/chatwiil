@@ -1,0 +1,317 @@
+/* =========================================================================
+   ENVIAR.CSS — Página de Mensajes Remotos ChatWii (Mobile-First)
+   ========================================================================= */
+
+/* ── Entrada de página ── */
+@keyframes env_entry {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes env_pulse_dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.5; transform: scale(1.35); }
+}
+
+@keyframes env_sent_pop {
+  0%   { transform: scale(0.88); opacity: 0; }
+  60%  { transform: scale(1.04); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* ── Wrapper principal ── */
+.env_wrap {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 2.4vh;
+  padding: 2vh 0 5vh;
+  animation: env_entry 0.55s ease-out;
+}
+
+/* ── Hero / cabecera ── */
+.env_hero {
+  width: 100%;
+  padding: 3vh 4vw 2.5vh;
+  background: var(--wb);
+  border-radius: 2vh;
+  border: 1px solid var(--brd);
+  display: flex;
+  align-items: center;
+  gap: 1.8vh;
+}
+
+.env_hero_icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--mora), #b44dff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--white);
+  font-size: 1.35rem;
+  flex-shrink: 0;
+  box-shadow: 0 6px 18px rgba(112, 0, 255, 0.3);
+}
+
+.env_hero_info {
+  flex: 1;
+  min-width: 0;
+}
+
+.env_hero_title {
+  font-size: var(--fz_m4);
+  font-weight: 700;
+  color: var(--tx);
+  margin: 0 0 0.3vh;
+}
+
+.env_hero_sub {
+  font-size: var(--fz_s3);
+  color: var(--tx3);
+  display: flex;
+  align-items: center;
+  gap: 0.5vh;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.env_status_dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--success);
+  flex-shrink: 0;
+  animation: env_pulse_dot 2s infinite;
+}
+
+/* ── Card de composición ── */
+.env_compose {
+  background: var(--wb);
+  border: 1px solid var(--brd);
+  border-radius: 2vh;
+  padding: 2.5vh;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5vh;
+}
+
+.env_compose_label {
+  font-size: var(--fz_s4);
+  font-weight: 600;
+  color: var(--tx2);
+  display: flex;
+  align-items: center;
+  gap: 0.8vh;
+}
+
+.env_compose_label i {
+  color: var(--mora);
+}
+
+.env_textarea {
+  width: 100%;
+  min-height: 120px;
+  max-height: 260px;
+  resize: none;
+  background: var(--inp);
+  border: 1.5px solid var(--brd);
+  border-radius: 1.5vh;
+  padding: 1.4vh 1.6vh;
+  font-size: var(--fz_m1);
+  color: var(--tx);
+  font-family: var(--ff_P);
+  line-height: 1.55;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.env_textarea:focus {
+  border-color: var(--mora);
+  box-shadow: 0 0 0 3px rgba(112, 0, 255, 0.12);
+}
+
+.env_compose_footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1vh;
+}
+
+.env_char_count {
+  font-size: var(--fz_s2);
+  color: var(--tx3);
+}
+
+.env_btn_send {
+  display: flex;
+  align-items: center;
+  gap: 0.8vh;
+  background: var(--mora);
+  color: var(--white);
+  border: none;
+  border-radius: 1.5vh;
+  padding: 1.1vh 2.2vh;
+  font-size: var(--fz_m);
+  font-weight: 600;
+  font-family: var(--ff_P);
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+  box-shadow: 0 4px 14px rgba(112, 0, 255, 0.3);
+}
+
+.env_btn_send:hover:not(:disabled) {
+  background: #5a00cc;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(112, 0, 255, 0.4);
+}
+
+.env_btn_send:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.env_btn_send.enviando {
+  background: var(--info);
+  box-shadow: 0 4px 14px rgba(0, 168, 230, 0.3);
+}
+
+.env_btn_send.enviado {
+  background: var(--success);
+  box-shadow: 0 4px 14px rgba(60, 215, 65, 0.35);
+  animation: env_sent_pop 0.35s ease;
+}
+
+/* ── Sugerencias rápidas ── */
+.env_sugs {
+  background: var(--wb);
+  border: 1px solid var(--brd);
+  border-radius: 2vh;
+  padding: 2vh 2.5vh;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2vh;
+}
+
+.env_sugs_title {
+  font-size: var(--fz_s4);
+  font-weight: 600;
+  color: var(--tx2);
+  display: flex;
+  align-items: center;
+  gap: 0.8vh;
+  margin: 0;
+}
+
+.env_sugs_title i {
+  color: var(--ora, var(--warning));
+}
+
+.env_sugs_grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1vh;
+}
+
+.env_chip {
+  background: var(--bg4);
+  border: 1px solid var(--brd);
+  border-radius: 5vh;
+  padding: 0.7vh 1.4vh;
+  font-size: var(--fz_s4);
+  font-weight: 500;
+  color: var(--tx2);
+  font-family: var(--ff_P);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.15s;
+}
+
+.env_chip:hover {
+  background: var(--mora);
+  color: var(--white);
+  border-color: var(--mora);
+  transform: translateY(-1px);
+}
+
+.env_chip:active {
+  transform: scale(0.96);
+}
+
+/* ── Historial de sesión ── */
+.env_historial {
+  background: var(--wb);
+  border: 1px solid var(--brd);
+  border-radius: 2vh;
+  padding: 2vh 2.5vh;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2vh;
+}
+
+.env_historial_title {
+  font-size: var(--fz_s4);
+  font-weight: 600;
+  color: var(--tx2);
+  display: flex;
+  align-items: center;
+  gap: 0.8vh;
+  margin: 0;
+}
+
+.env_historial_title i {
+  color: var(--tx3);
+}
+
+.env_historial_list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8vh;
+}
+
+.env_historial_item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1vh;
+  font-size: var(--fz_s4);
+  color: var(--tx3);
+  animation: env_sent_pop 0.3s ease;
+}
+
+.env_historial_item i {
+  color: var(--success);
+  margin-top: 0.15em;
+  flex-shrink: 0;
+}
+
+.env_historial_empty {
+  font-size: var(--fz_s3);
+  color: var(--tx3);
+  font-style: italic;
+  text-align: center;
+  padding: 1vh 0;
+}
+
+/* ── Responsive ── */
+@media (min-width: 480px) {
+  .env_hero { padding: 3vh 5vw 2.5vh; }
+  .env_compose { padding: 3vh; }
+  .env_textarea { min-height: 140px; }
+}
+
+@media (min-width: 768px) {
+  .env_wrap { max-width: 580px; margin: 0 auto; }
+  .env_hero_title { font-size: var(--fz_m5); }
+  .env_chip { font-size: var(--fz_s4); padding: 0.8vh 1.6vh; }
+}
+
+@media (min-width: 1024px) {
+  .env_wrap { max-width: 640px; }
+}
