@@ -1,6 +1,6 @@
 import { app } from './wii.js';
-import { Notificacion, wiPath, wiFade } from './widev/widev.js';
-import * as inicioMod from './todos/inicio.js';
+import { Notificacion, wiPath, wiFade } from './core/widev/widev.js';
+import * as inicioMod from './features/public/inicio.js';
 
 // ── ROL_PATH — rutas por defecto al iniciar sesión ──────────────────────────
 export const ROL_PATH = {
@@ -26,7 +26,7 @@ export const NAV = {
     ],
     more: [
       { href: '/perfil', ico: 'fa-user', txt: 'Mi Perfil', desc: 'Edita tus datos personales y tema visual.' },
-      { href: '/win',   page: 'win',   ico: 'fa-file-word', txt: 'Win Editor' },
+      { href: '/win',   page: 'win',   ico: 'fa-file-word', txt: 'Win Editor', desc: 'Redacta, edita y organiza tus notas y apuntes rápidos.' },
     ]
   },
   gestor: {
@@ -106,10 +106,20 @@ export const RUTAS = Object.entries({
 
 // ── GLOB — Vite mapea todos los módulos en build time ────────────────────────
 const MODS = import.meta.glob([
-  './{todos,smile,gestor,admin,wiauth}/**/*.js',
-  '!./todos/inicio.js'
+  './features/**/*.js',
+  '!./features/public/inicio.js'
 ]);
-const rutasMod = (area, page) => MODS[`./${area}/${page}.js`];
+const rutasMod = (area, page) => {
+  let mappedArea = area;
+  if (area === 'wiauth') mappedArea = 'auth';
+  else if (area === 'smile') mappedArea = 'chat';
+  else if (area === 'todos') mappedArea = 'public';
+  
+  if (area.startsWith('todos/')) mappedArea = area.replace('todos/', 'public/');
+  if (page === 'perfil') mappedArea = 'profile';
+  
+  return MODS[`./features/${mappedArea}/${page}.js`];
+};
 
 // ── MOTOR ───────────────────────────────────────────────────────────────────
 class WiRutas {
@@ -169,7 +179,7 @@ class WiRutas {
     const norm = wiPath.limpiar(ruta) === '/' ? `/${this.HOME}` : wiPath.limpiar(ruta);
 
     // ── GUARDIA GLOBAL DE SEGURIDAD ──────────────────────────────────────────
-    const { getls } = await import('./widev/widev.js');
+    const { getls } = await import('./core/widev/widev.js');
     const wi = getls('wiSmile');
     const configRuta = RUTAS.find(r => r.path === norm);
     const go = r => (this.cargand = false, this.navigate(r, true));

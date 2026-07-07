@@ -1,6 +1,6 @@
-import { app, icon } from './wii.js';
-import { rutas, NAV } from './rutas.js';
-import { Mensaje, wiAuth } from './widev/widev.js';
+import { app, icon } from '@wii';
+import { rutas, NAV } from '@rutas';
+import { Mensaje, wiAuth } from '@core/widev/widev.js';
 
 // ── LOGO — generado desde wii.js ─────────────────────────────────────────────
 const LOGO = `<a href="/"><i class="fa-solid ${icon}"></i> ${app}</a>`;
@@ -70,16 +70,16 @@ window.addEventListener('winavigate', ({ detail: { norm } }) => renderHeader(wiA
 
 // ── EVENTOS GLOBALES ──────────────────────────────────────────────────────────
 addDocListener('click', '.bt_salir', async () => {
-  const { salir } = await import('./wiauth/visual.js');
+  const { salir } = await import('@features/auth/visual.js');
   salir(['wiTema', 'wiSmart']);
 });
 
-const prefetchLogin = () => import('./wiauth/visual.js');
+const prefetchLogin = () => import('@features/auth/visual.js');
 addDocListener('mouseenter', '.bt_auth', prefetchLogin);
 addDocListener('touchstart', '.bt_auth', prefetchLogin);
 
 addDocListener('click', '.bt_auth', async function () {
-  const { abrirLogin } = await import('./wiauth/visual.js');
+  const { abrirLogin } = await import('@features/auth/visual.js');
   const isRegistrar = this.classList.contains('registrar');
   abrirLogin(isRegistrar ? 'registrar' : 'login');
 });

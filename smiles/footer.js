@@ -1,5 +1,5 @@
-import { app, lanzamiento, by, linkme, version, icon } from './wii.js';
-import { savels, getls } from './widev/widev.js';
+import { app, lanzamiento, by, linkme, version, icon } from '@wii';
+import { savels, getls } from '@core/widev/widev.js';
 
 // ── Redes Sociales ───────────────────────────────────────────────────────────
 const REDES = [

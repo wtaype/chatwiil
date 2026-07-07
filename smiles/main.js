@@ -1,4 +1,4 @@
-import { getls, wiSmart } from './widev/widev.js';
+import { getls, wiSmart } from '@core/widev/widev.js';
 import { rutas } from './rutas.js';
 
 // Inicialización de Rutas dinámicas según el Rol del usuario logueado
