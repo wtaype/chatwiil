@@ -9,8 +9,8 @@ const LOGO = `<a href="/"><i class="fa-solid ${icon}"></i> ${app}</a>`;
 const buildNav = (items, wi, pageAct) => items.map(i => {
   if (i.isBtn) return `<button class="${i.cls}"><i class="fas ${i.ico}"></i><span>${i.txt}</span></button>`;
   if (i.isPerfil) {
-    const isAct = pageAct.startsWith('cuenta/perfil');
-    return `<a href="/cuenta/perfil" class="nv_item ${isAct ? 'active' : ''}" data-page="cuenta/perfil"><img src="${wi?.avatar || `${import.meta.env.BASE_URL}smile.avif`}" alt="${wi?.nombre}"><span>${wi?.nombre}</span></a>`;
+    const isAct = window.location.hash.startsWith('#cuenta');
+    return `<a href="#cuenta/perfil" class="nv_item ${isAct ? 'active' : ''}"><img src="${wi?.avatar || `${import.meta.env.BASE_URL}smile.avif`}" alt="${wi?.nombre}"><span>${wi?.nombre}</span></a>`;
   }
   if (i.isSalir) return `<button class="nv_item bt_salir" data-page="inicio"><i class="fa-solid fa-sign-out-alt"></i> <span>Salir</span></button>`;
   const isAct = pageAct === i.page;
@@ -64,7 +64,7 @@ addDocListener('click', '.movil_close, .movil_overlay, .movil_nav .nv_item, .mov
 // ── ROUTE LISTENER — re-renderiza el nav en cada navegación SPA ───────────────
 const checkLayout = (path) => {
   const isAuth = !!wiAuth.user;
-  const clean = (isAuth && (path === '/' || path === '/inicio')) || path.startsWith('/cuenta') || path.startsWith('/lab') || path.startsWith('/smile');
+  const clean = (isAuth && (path === '/' || path === '/inicio')) || path.startsWith('/lab') || path.startsWith('/smile');
   document.body.dataset.layout = clean ? 'auth-clean' : 'public';
 };
 

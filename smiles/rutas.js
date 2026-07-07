@@ -24,7 +24,7 @@ export const NAV = {
       { isPerfil: true }, { isSalir: true }
     ],
     more: [
-      { href: '/cuenta/perfil', ico: 'fa-user', txt: 'Mi Cuenta', desc: 'Edita tus datos personales, tema visual, permisos y descargas.' },
+      { href: '#cuenta/perfil', ico: 'fa-user', txt: 'Mi Cuenta', desc: 'Edita tus datos personales, tema visual, permisos y descargas.' },
       { href: '/win',   page: 'win',   ico: 'fa-file-word', txt: 'Win Editor', desc: 'Redacta, edita y organiza tus notas y apuntes rápidos.' },
     ]
   },
@@ -40,7 +40,7 @@ export const NAV = {
     ],
     more: [
       { href: '/smile',  ico: 'fa-users', txt: 'Dashboard Colaborador', desc: 'Panel de ventas y estadísticas personales.' },
-      { href: '/cuenta/perfil', ico: 'fa-user', txt: 'Mi Cuenta', desc: 'Edita tus datos personales, tema visual, permisos y descargas.' }
+      { href: '#cuenta/perfil', ico: 'fa-user', txt: 'Mi Cuenta', desc: 'Edita tus datos personales, tema visual, permisos y descargas.' }
     ]
   },
   admin: {
@@ -55,7 +55,7 @@ export const NAV = {
     more: [
       { href: '/smile',  ico: 'fa-users', txt: 'Dashboard Colaborador', desc: 'Panel de ventas y estadísticas personales.' },
       { href: '/gestor', ico: 'fa-crown', txt: 'Dashboard Gerencia', desc: 'Panel de ingresos, ganancias y estadísticas de la empresa.' },
-      { href: '/cuenta/perfil', ico: 'fa-user', txt: 'Mi Cuenta', desc: 'Edita tus datos personales, tema visual, permisos y descargas.' }
+      { href: '#cuenta/perfil', ico: 'fa-user', txt: 'Mi Cuenta', desc: 'Edita tus datos personales, tema visual, permisos y descargas.' }
     ]
   },
   verificar: {
@@ -81,12 +81,6 @@ export const RUTAS = Object.entries({
   '/terminos': 'todos/acerca',
 
   // Autenticadas comunes (objeto define 'area' y 'roles')
-  '/cuenta/perfil': { area: 'cuenta', page: 'cuenta', roles: ['smile', 'gestor', 'admin'] },
-  '/cuenta/ajustes': { area: 'cuenta', page: 'cuenta', roles: ['smile', 'gestor', 'admin'] },
-  '/cuenta/permisos': { area: 'cuenta', page: 'cuenta', roles: ['smile', 'gestor', 'admin'] },
-  '/cuenta/historial': { area: 'cuenta', page: 'cuenta', roles: ['smile', 'gestor', 'admin'] },
-  '/cuenta/descargar': { area: 'cuenta', page: 'cuenta', roles: ['smile', 'gestor', 'admin'] },
-  '/cuenta/enviar': { area: 'cuenta', page: 'cuenta', roles: ['smile', 'gestor', 'admin'] },
   '/more': { area: 'smile', roles: ['smile', 'gestor', 'admin'] },
   '/win': { area: 'smile', roles: ['smile', 'gestor', 'admin'] },
   '/lab': { area: 'lab', page: 'lab', roles: ['smile', 'gestor', 'admin'] },
@@ -191,11 +185,13 @@ class WiRutas {
     // Redirección de rutas obsoletas a cuenta modular
     if (norm === '/perfil') {
       this.cargand = false;
-      return this.navigate('/cuenta/perfil', true);
+      window.location.href = '/#cuenta/perfil';
+      return;
     }
     if (norm === '/enviar') {
       this.cargand = false;
-      return this.navigate('/cuenta/enviar', true);
+      window.location.href = '/#cuenta/enviar';
+      return;
     }
 
     // Redirección de /smile a la raíz /
@@ -298,10 +294,14 @@ class WiRutas {
     };
 
     addDocListener('click', '.nv_item:not(.bt_salir)', (e) => {
-      e.preventDefault();
       const currentTarget = e.target?.closest?.('.nv_item:not(.bt_salir)');
-      if (currentTarget) {
-        const pag = currentTarget.getAttribute('data-page');
+      if (!currentTarget) return;
+      const href = currentTarget.getAttribute('href');
+      if (href && href.startsWith('#')) return; // Permitir navegación nativa por hash
+      
+      e.preventDefault();
+      const pag = currentTarget.getAttribute('data-page');
+      if (pag) {
         this.navigate(pag === this.HOME ? '/' : `/${pag}`);
       }
     });

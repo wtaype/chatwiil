@@ -56,17 +56,27 @@
             const [n, c] = t.dataset.ths.split('|');
             h.dataset.theme = n;
             m.content = c;
-            localStorage.wiTema = t.dataset.ths;
+            localStorage.wiTema = n;
             ts.forEach(x => x.classList.toggle('mtha', x === t))
           };
     w.addEventListener('click', e => e.target.matches('.tema') && st(e.target), { passive: !0 });
-    const stored = localStorage.wiTema;
+    let stored = localStorage.wiTema;
+    if (stored && stored.startsWith('{')) {
+      stored = null; // Ignorar formato JSON viejo
+    }
+    if (stored && stored.includes('|')) {
+      stored = stored.split('|')[0]; // Migrar formato viejo 'nombre|color'
+    }
     let target = null;
     if (stored) {
-      target = w.querySelector(`[data-ths="${stored}"]`);
+      try {
+        target = w.querySelector(`[data-ths^="${stored}|"]`);
+      } catch (e) {}
     }
     if (!target && typeof dtema !== 'undefined' && dtema) {
-      target = w.querySelector(`[data-ths^="${dtema}|"]`);
+      try {
+        target = w.querySelector(`[data-ths^="${dtema}|"]`);
+      } catch (e) {}
     }
     if (!target) {
       target = ts[1];

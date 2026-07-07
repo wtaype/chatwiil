@@ -386,7 +386,7 @@ export const render = () => {
           
           <div class="chat_header_actions">
             <!-- Botón Perfil -->
-            <a href="/cuenta/perfil" class="chat_nv_item" title="Mi Cuenta" data-page="cuenta/perfil">
+            <a href="#cuenta/perfil" class="chat_nv_item" title="Mi Cuenta">
               <img src="${user.avatar || '/smile.avif'}" alt="Avatar" id="chatHeaderAvatar" class="chat_user_avatar">
               <span>Mi Cuenta</span>
             </a>

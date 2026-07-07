@@ -86,7 +86,7 @@ export const init = () => {
 
       const theme = card.dataset.theme;
       document.documentElement.dataset.theme = theme;
-      savels('wiTema', theme);
+      localStorage.wiTema = theme;
 
       Mensaje(`Tema ${theme.toUpperCase()} aplicado con éxito`, 'success');
     });

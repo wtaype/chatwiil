@@ -219,7 +219,7 @@ export const init = () => {
       
       // Aplicar tema en root
       document.documentElement.dataset.theme = theme;
-      savels('wiTema', theme); // Guardar en preferencias para persistencia
+      localStorage.wiTema = theme; // Guardar en preferencias para persistencia
 
       // Re-renderizar tabla de variables con valores computados
       setTimeout(() => {
