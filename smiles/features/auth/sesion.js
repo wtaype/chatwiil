@@ -88,9 +88,18 @@ export const entrar = (wi) => {
     console.error('Error actualizando actividad:', error);
   });
 
-  setTimeout(() => {
-    window.location.href = ROL_PATH[wi?.rol] || '/';
-  }, 1000);
+  // Navegar sin recarga completa usando el router SPA interno.
+  // Se limpia el caché de /inicio para que inicio() re-evalúe el usuario
+  // y devuelva chatwii/visual.js en vez del módulo público cacheado.
+  const destino = ROL_PATH[wi?.rol] || '/';
+  const router = window._wiRutas?.rutas;
+  if (router) {
+    cerrarTodos();
+    delete router.cache['/inicio'];
+    router.navigate(destino);
+  } else {
+    setTimeout(() => { window.location.href = destino; }, 800);
+  }
 };
 
 export const salir = async (keep = []) => {

@@ -248,16 +248,16 @@ class WiRutas {
       this.marcarNav(norm);
       window.dispatchEvent(new CustomEvent('winavigate', { detail: { norm } }));
 
-      // Hydration
+      // Hydration: solo omitir wiFade si el módulo cargado ES el inicio público.
+      // Si el usuario autenticado fue redirigido a chatwii/visual.js, siempre renderizar.
       const mainEl = document.querySelector(this.main);
       const esHydration = this.isFirstLoad
         && mainEl
         && mainEl.children.length > 0
         && !window.__WIREADY__
-        && norm === `/${this.HOME}`;
-      if (esHydration) {
-        this.isFirstLoad = false;
-      } else {
+        && norm === `/${this.HOME}`
+        && mod === inicioMod;   // ← clave: solo hydrate si es el módulo público real
+      if (!esHydration) {
         await wiFade(this.main, html);
       }
       this.isFirstLoad = false;
