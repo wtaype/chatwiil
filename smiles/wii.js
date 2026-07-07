@@ -9,18 +9,18 @@ export let linkweb = 'https://chatwii.web.app';
 export let lanzamiento = 2026;
 export let by = '@wilder.taype';
 export let linkme = 'https://wtaype.github.io/';
-export let version = 'v15';
+export let version = 'v16';
 export let dtema = 'paz';
 
 export default { id, app, icon, titulo, keywii, descri, linkweb, lanzamiento, by, linkme, version, dtema };
 
 /** ACTUALIZAR AL TAG POR SEGURIDAD [TAG NUEVO] (1)
-git tag v15 -m "Version v15" ; git push origin v15
+git tag v16 -m "Version v16" ; git push origin v16
 
 ACTUALIZACIÓN AL MAIN PRINCIPAL DEL PROYECTO [MAIN] (2)
-git add . ; git commit -m "Actualizacion Principal v15.10.10" ; git push origin main
+git add . ; git commit -m "Actualizacion Principal v16.10.10" ; git push origin main
 
 // REEMPLAZAR TAG DE SEGURIDAD EXISTENTE [TAG REMPLAZO] (3)
-git tag -d v15 ; git tag v15 -m "Version v15 actualizada" ; git push origin v15 --force
+git tag -d v16 ; git tag v16 -m "Version v16 actualizada" ; git push origin v16 --force
 
  ACTUALIZACION TAG[END] */
