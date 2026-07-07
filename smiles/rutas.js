@@ -4,7 +4,7 @@ import * as inicioMod from './features/public/inicio.js';
 
 // ── ROL_PATH — rutas por defecto al iniciar sesión ──────────────────────────
 export const ROL_PATH = {
-  smile:  '/smile',
+  smile:  '/',
   gestor: '/gestor',
   admin:  '/admin'
 };
@@ -12,20 +12,19 @@ export const ROL_PATH = {
 // ── NAV — Config visual por rol (nvleft = izquierda, nvright = derecha) ────────
 export const NAV = {
   todos: {
-    nvleft:  [{ href: '/', page: 'inicio', ico: 'fa-house', txt: 'Bienvenido' }],
+    nvleft:  [],
     nvright: [{ isBtn: true, cls: 'bt_auth login', ico: 'fa-sign-in-alt', txt: 'Iniciar sesión' }]
   },
   smile: {
     nvleft: [
       { href: '/smile', page: 'smile', ico: 'fa-house', txt: 'Dashboard' },
-      { href: '/enviar', page: 'enviar', ico: 'fa-paper-plane', txt: 'Enviar' },
       { href: '/more',  page: 'more',  ico: 'fa-ellipsis', txt: 'Más' }
     ],
     nvright: [
       { isPerfil: true }, { isSalir: true }
     ],
     more: [
-      { href: '/perfil', ico: 'fa-user', txt: 'Mi Perfil', desc: 'Edita tus datos personales y tema visual.' },
+      { href: '/cuenta/perfil', ico: 'fa-user', txt: 'Mi Cuenta', desc: 'Edita tus datos personales, tema visual, permisos y descargas.' },
       { href: '/win',   page: 'win',   ico: 'fa-file-word', txt: 'Win Editor', desc: 'Redacta, edita y organiza tus notas y apuntes rápidos.' },
     ]
   },
@@ -41,7 +40,7 @@ export const NAV = {
     ],
     more: [
       { href: '/smile',  ico: 'fa-users', txt: 'Dashboard Colaborador', desc: 'Panel de ventas y estadísticas personales.' },
-      { href: '/perfil', ico: 'fa-user', txt: 'Mi Perfil', desc: 'Edita tus datos personales y tema visual.' }
+      { href: '/cuenta/perfil', ico: 'fa-user', txt: 'Mi Cuenta', desc: 'Edita tus datos personales, tema visual, permisos y descargas.' }
     ]
   },
   admin: {
@@ -56,7 +55,7 @@ export const NAV = {
     more: [
       { href: '/smile',  ico: 'fa-users', txt: 'Dashboard Colaborador', desc: 'Panel de ventas y estadísticas personales.' },
       { href: '/gestor', ico: 'fa-crown', txt: 'Dashboard Gerencia', desc: 'Panel de ingresos, ganancias y estadísticas de la empresa.' },
-      { href: '/perfil', ico: 'fa-user', txt: 'Mi Perfil', desc: 'Edita tus datos personales y tema visual.' }
+      { href: '/cuenta/perfil', ico: 'fa-user', txt: 'Mi Cuenta', desc: 'Edita tus datos personales, tema visual, permisos y descargas.' }
     ]
   },
   verificar: {
@@ -82,11 +81,15 @@ export const RUTAS = Object.entries({
   '/terminos': 'todos/acerca',
 
   // Autenticadas comunes (objeto define 'area' y 'roles')
-  '/smile': { area: 'smile', roles: ['smile', 'gestor', 'admin'] },
-  '/enviar': { area: 'smile', roles: ['smile', 'gestor', 'admin'] },
-  '/perfil': { area: 'smile', roles: ['smile', 'gestor', 'admin'] },
+  '/cuenta/perfil': { area: 'cuenta', page: 'cuenta', roles: ['smile', 'gestor', 'admin'] },
+  '/cuenta/ajustes': { area: 'cuenta', page: 'cuenta', roles: ['smile', 'gestor', 'admin'] },
+  '/cuenta/permisos': { area: 'cuenta', page: 'cuenta', roles: ['smile', 'gestor', 'admin'] },
+  '/cuenta/historial': { area: 'cuenta', page: 'cuenta', roles: ['smile', 'gestor', 'admin'] },
+  '/cuenta/descargar': { area: 'cuenta', page: 'cuenta', roles: ['smile', 'gestor', 'admin'] },
+  '/cuenta/enviar': { area: 'cuenta', page: 'cuenta', roles: ['smile', 'gestor', 'admin'] },
   '/more': { area: 'smile', roles: ['smile', 'gestor', 'admin'] },
   '/win': { area: 'smile', roles: ['smile', 'gestor', 'admin'] },
+  '/lab': { area: 'lab', page: 'lab', roles: ['smile', 'gestor', 'admin'] },
 
   // Gestor
   '/gestor': { area: 'gestor', roles: ['gestor', 'admin'] },
@@ -112,7 +115,7 @@ const MODS = import.meta.glob([
 const rutasMod = (area, page) => {
   let mappedArea = area;
   if (area === 'wiauth') mappedArea = 'auth';
-  else if (area === 'smile') mappedArea = 'chat';
+  else if (area === 'smile') mappedArea = 'smile';
   else if (area === 'todos') mappedArea = 'public';
   
   if (area.startsWith('todos/')) mappedArea = area.replace('todos/', 'public/');
@@ -125,7 +128,7 @@ const rutasMod = (area, page) => {
 class WiRutas {
   constructor() {
     this.rutas     = {};               // funciones lazy originales
-    this.cache     = { '/inicio': inicioMod };
+    this.cache     = {};
     this.modActual = null;
     this.cargand   = false;
     this.HOME      = 'inicio';
@@ -135,7 +138,14 @@ class WiRutas {
   }
 
   register(path, fn) { this.rutas[path] = fn; }
-  inicio() { return Promise.resolve(inicioMod); }
+  async inicio() {
+    const { getls } = await import('./core/widev/widev.js');
+    const wi = getls('wiSmile');
+    if (wi) {
+      return (await MODS['./features/chatwii/visual.js']());
+    }
+    return inicioMod;
+  }
 
   registerAll(getRol) {
     RUTAS.forEach(({ path, area, page, roles }) => {
@@ -176,7 +186,23 @@ class WiRutas {
   async navigate(ruta, historial = true) {
     if (this.cargand) return;
     this.cargand = true;
-    const norm = wiPath.limpiar(ruta) === '/' ? `/${this.HOME}` : wiPath.limpiar(ruta);
+    let norm = wiPath.limpiar(ruta) === '/' ? `/${this.HOME}` : wiPath.limpiar(ruta);
+
+    // Redirección de rutas obsoletas a cuenta modular
+    if (norm === '/perfil') {
+      this.cargand = false;
+      return this.navigate('/cuenta/perfil', true);
+    }
+    if (norm === '/enviar') {
+      this.cargand = false;
+      return this.navigate('/cuenta/enviar', true);
+    }
+
+    // Redirección de /smile a la raíz /
+    if (norm === '/smile') {
+      this.cargand = false;
+      return this.navigate('/', true);
+    }
 
     // ── GUARDIA GLOBAL DE SEGURIDAD ──────────────────────────────────────────
     const { getls } = await import('./core/widev/widev.js');
@@ -185,11 +211,14 @@ class WiRutas {
     const go = r => (this.cargand = false, this.navigate(r, true));
 
     if (wi) {
-      if (['/login', '/', '/inicio'].includes(norm)) {
-        return go(ROL_PATH[wi.rol] || '/smile');
+      const targetPath = ROL_PATH[wi.rol] || '/';
+      const targetNorm = wiPath.limpiar(targetPath) === '/' ? `/${this.HOME}` : wiPath.limpiar(targetPath);
+
+      if (['/login', '/', '/inicio'].includes(norm) && norm !== targetNorm) {
+        return go(targetPath);
       }
       if (configRuta && configRuta.roles && !configRuta.roles.includes(wi.rol)) {
-        return go(ROL_PATH[wi.rol] || '/smile');
+        return go(targetPath);
       }
       if (['/admin'].includes(norm)) {
         const dest = wi.rol !== 'admin' ? '/' : wi.estado !== 'activo' ? '/registrado' : !sessionStorage.getItem('vault_unlocked') ? '/verificar' : null;
@@ -197,7 +226,7 @@ class WiRutas {
       }
     } else {
       if (configRuta && configRuta.roles) {
-        return go('/login');
+        return go('/');
       }
     }
 

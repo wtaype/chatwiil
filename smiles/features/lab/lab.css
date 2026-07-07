@@ -1,0 +1,557 @@
+.lab_wrap {
+  padding: 3vh 2vw;
+  background: var(--bg);
+  color: var(--tx);
+  min-height: 100vh;
+  font-family: 'Poppins', sans-serif;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- TOPBAR --- */
+.lab_topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.45);
+  border: 1px solid var(--brd);
+  border-radius: 1.5vh;
+  padding: 1.8vh 2vw;
+  margin-bottom: 3vh;
+  backdrop-filter: blur(1vh);
+  box-shadow: 0 0.4vh 1vh rgba(0, 0, 0, 0.02);
+}
+
+.lab_logo {
+  display: flex;
+  align-items: center;
+  gap: 0.8vw;
+}
+
+.lab_logo h1 {
+  font-size: 2.2vh;
+  font-weight: 700;
+  margin: 0;
+}
+
+.lab_logo i {
+  font-size: 3vh;
+  color: var(--mco);
+}
+
+.lab_theme_selector {
+  display: flex;
+  align-items: center;
+  gap: 1vw;
+  font-size: 1.5vh;
+  font-weight: 500;
+}
+
+.lab_theme_buttons {
+  display: flex;
+  gap: 0.5vw;
+}
+
+.lab_theme_btn {
+  padding: 0.8vh 1.2vw;
+  border-radius: 0.8vh;
+  border: 1px solid var(--brd);
+  background: rgba(255, 255, 255, 0.8);
+  color: var(--tx);
+  font-size: 1.2vh;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--tr_s);
+}
+
+.lab_theme_btn:hover {
+  background: var(--bg3);
+}
+
+.lab_theme_btn.active {
+  background: var(--mco);
+  color: var(--txa);
+  border-color: var(--mco);
+}
+
+.lab_back_btn {
+  padding: 1vh 1.5vw;
+  border-radius: 1vh;
+  background: var(--mco);
+  color: var(--txa);
+  font-weight: 600;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5vw;
+  transition: all var(--tr_f);
+  font-size: 1.4vh;
+}
+
+.lab_back_btn:hover {
+  transform: translateY(-0.1vh);
+  filter: brightness(1.1);
+}
+
+/* --- GRID --- */
+.lab_grid {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  gap: 2vw;
+  flex: 1;
+  height: 75vh;
+}
+
+.lab_panel {
+  background: rgba(255, 255, 255, 0.25);
+  border: 1px solid var(--brd);
+  border-radius: 2vh;
+  padding: 3vh 2vw;
+  display: flex;
+  flex-direction: column;
+  backdrop-filter: blur(1.5vh);
+  box-shadow: 0 0.8vh 2vh rgba(0, 0, 0, 0.02);
+}
+
+.lab_panel h2 {
+  font-size: 2.1vh;
+  margin-top: 0;
+  margin-bottom: 2vh;
+  font-weight: 700;
+}
+
+.lab_desc {
+  font-size: 1.4vh;
+  color: var(--tx2);
+  margin-top: 0;
+  margin-bottom: 2.5vh;
+}
+
+.lab_vars_table {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.vars_table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.vars_table th, .vars_table td {
+  padding: 1.2vh 1vw;
+  font-size: 1.35vh;
+  text-align: left;
+  border-bottom: 1px solid var(--brd);
+}
+
+.vars_table th {
+  font-weight: 600;
+  color: var(--tx2);
+}
+
+.color_swatch {
+  width: 4.5vh;
+  height: 2.5vh;
+  border-radius: 0.5vh;
+}
+
+.lab_design_notes {
+  margin-top: 3vh;
+  padding: 1.8vh 1.2vw;
+  background: rgba(255, 255, 255, 0.35);
+  border-radius: 1vh;
+  border: 1px solid var(--brd);
+}
+
+.lab_design_notes h3 {
+  font-size: 1.5vh;
+  margin-top: 0;
+  margin-bottom: 1vh;
+  display: flex;
+  align-items: center;
+  gap: 0.4vw;
+}
+
+.lab_design_notes ul {
+  margin: 0;
+  padding-left: 1.2vw;
+  font-size: 1.3vh;
+  color: var(--tx2);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6vh;
+}
+
+/* --- VIEWPORT SIMULATION (GLASSMORPHIC CHAT) --- */
+.lab_viewport_sim {
+  flex: 1;
+  border: 1px solid var(--brd);
+  border-radius: 1.5vh;
+  display: flex;
+  background: var(--bg);
+  overflow: hidden;
+  box-shadow: 0 1vh 3vh rgba(0, 0, 0, 0.05);
+}
+
+/* 1. Sidebar */
+.mini_sidebar {
+  width: 32%;
+  background: var(--bg9);
+  border-right: 1px solid var(--bg12);
+  backdrop-filter: blur(2vh) saturate(180%);
+  -webkit-backdrop-filter: blur(2vh) saturate(180%);
+  padding: 2vh 1vw;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5vh;
+  box-sizing: border-box;
+  box-shadow: 0.4vh 0 1.5vh var(--bg4);
+}
+
+.mini_brand {
+  font-size: 1.6vh;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.4vw;
+  color: var(--tx);
+}
+
+/* Buscador en Sidebar */
+.mini_search_wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5vw;
+  background: rgba(255, 255, 255, 0.35);
+  border: 1px solid var(--bg12);
+  border-radius: 0.8vh;
+  padding: 0.8vh 0.8vw;
+  box-sizing: border-box;
+}
+
+.mini_search_wrap i {
+  color: var(--tx3);
+  font-size: 1.2vh;
+}
+
+.mini_search_input {
+  border: none;
+  background: transparent;
+  outline: none;
+  width: 100%;
+  font-size: 1.1vh;
+  color: var(--tx);
+}
+
+.mini_btn_new {
+  padding: 1.2vh 0;
+  background: var(--mco);
+  color: var(--txa);
+  border: none;
+  border-radius: 0.8vh;
+  font-size: 1.3vh;
+  font-weight: 600;
+  width: 100%;
+  cursor: pointer;
+  box-shadow: 0 0.4vh 1vh rgba(0, 0, 0, 0.05);
+}
+
+.mini_chat_list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6vh;
+  flex: 1;
+}
+
+.mini_chat_item {
+  display: flex;
+  align-items: center;
+  gap: 0.6vw;
+  padding: 1.2vh 0.8vw;
+  border-radius: 0.8vh;
+  color: var(--tx2);
+  font-size: 1.2vh;
+  transition: all var(--tr_s);
+  border: 1px solid transparent;
+}
+
+/* Item activo: bg wb, sin borde y con sombra prominente del tema */
+.mini_chat_item.active {
+  background: var(--wb);
+  border-color: var(--bg12);
+  color: var(--tx);
+  font-weight: 600;
+  box-shadow: 0 0.8vh 2vh var(--bg5);
+}
+
+.mini_avatar {
+  width: 3.5vh;
+  height: 3.5vh;
+  border-radius: 50%;
+  background: var(--mco);
+  color: var(--txa);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 1.1vh;
+  flex-shrink: 0;
+}
+
+.mini_item_text {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.mini_item_text strong {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mini_item_text span {
+  font-size: 1vh;
+  color: var(--tx3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mini_sidebar_bottom {
+  display: flex;
+  justify-content: space-around;
+  font-size: 1.8vh;
+  color: var(--tx3);
+  border-top: 1px solid var(--bg12);
+  padding-top: 1.8vh;
+}
+
+.mini_sidebar_bottom i {
+  cursor: pointer;
+}
+
+.mini_sidebar_bottom i.active {
+  color: var(--mco);
+}
+
+/* 2. Workspace */
+.mini_chat_workspace {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+}
+
+.mini_header {
+  height: 7vh;
+  background: var(--bg9);
+  border-bottom: 1px solid var(--bg12);
+  backdrop-filter: blur(1.5vh);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 1.2vw;
+}
+
+.mini_header_info h3 {
+  font-size: 1.5vh;
+  margin: 0;
+  font-weight: 700;
+}
+
+.mini_status {
+  font-size: 1.1vh;
+  color: #29C72E;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.3vw;
+}
+
+.mini_status i {
+  font-size: 0.8vh;
+}
+
+.mini_header_actions {
+  display: flex;
+  align-items: center;
+  gap: 0.8vw;
+}
+
+/* Botones simétricos: fixed height de 4.5vh, padding horizontal, display flex */
+.mini_nv_item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 4.5vh;
+  padding: 0 1vw;
+  border-radius: 0.8vh;
+  color: var(--tx) !important;
+  font-size: 1.25vh;
+  font-weight: 500;
+  text-decoration: none;
+  background: var(--bg);
+  border: none;
+  margin: 0;
+  cursor: pointer;
+  transition: all var(--tr_s);
+  box-shadow: 0 0.4vh 1vh var(--bg4);
+  box-sizing: border-box;
+  gap: 0.5vw;
+}
+
+.mini_nv_item img {
+  width: 2.8vh;
+  height: 2.8vh;
+  border-radius: 50%;
+  border: 1.5px solid var(--mco);
+  object-fit: cover;
+}
+
+.mini_nv_item i {
+  font-size: 1.4vh;
+}
+
+/* Hover y Active: mantienen background var(--bg), solo cambia la sombra */
+.mini_nv_item:hover,
+.mini_nv_item.active {
+  background: var(--bg);
+  box-shadow: 0 0.6vh 1.5vh var(--bg5);
+  font-weight: 600;
+}
+
+/* Salir: mantiene background var(--bg) y sombra, simétrico al de perfil */
+.mini_nv_item.bt_salir {
+  color: var(--tx) !important;
+  background: var(--bg);
+  border: none;
+  box-shadow: 0 0.4vh 1vh var(--bg4);
+}
+
+.mini_nv_item.bt_salir:hover {
+  background: rgba(255, 56, 73, 0.12) !important;
+  box-shadow: 0 0.6vh 1.5vh rgba(255, 56, 73, 0.2) !important;
+  color: #ff3849 !important;
+}
+
+.mini_body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 2.5vh 1.5vw;
+  display: flex;
+  flex-direction: column;
+  gap: 1.8vh;
+}
+
+.mini_msg {
+  display: flex;
+  width: 100%;
+}
+
+.mini_msg.user {
+  justify-content: flex-end;
+}
+
+.mini_msg.assistant {
+  justify-content: flex-start;
+}
+
+.mini_bubble {
+  max-width: 75%;
+  padding: 1.2vh 1.2vw;
+  border-radius: 1.5vh;
+  font-size: 1.35vh;
+  line-height: 1.4;
+  box-shadow: 0 0.1vh 0.4vh rgba(0, 0, 0, 0.02);
+}
+
+.mini_msg.user .mini_bubble {
+  background: var(--mco);
+  color: var(--txa);
+  border-bottom-right-radius: 0.3vh;
+}
+
+.mini_msg.assistant .mini_bubble {
+  background: var(--bg10);
+  border: 1px solid var(--bg12);
+  color: var(--tx);
+  border-bottom-left-radius: 0.3vh;
+  backdrop-filter: blur(1vh);
+  -webkit-backdrop-filter: blur(1vh);
+}
+
+.mini_footer {
+  padding: 1.8vh 1.5vw;
+  background: transparent;
+}
+
+.mini_input_pill {
+  display: flex;
+  align-items: center;
+  gap: 0.8vw;
+  background: var(--bg11);
+  border: 1px solid var(--bg12);
+  backdrop-filter: blur(1.5vh);
+  -webkit-backdrop-filter: blur(1.5vh);
+  border-radius: 3.5vh;
+  padding: 1vh 1.2vw;
+  box-shadow: 0 0.5vh 1.5vh rgba(0, 0, 0, 0.03);
+}
+
+.mini_input_pill i {
+  color: var(--tx3);
+  font-size: 1.5vh;
+}
+
+.mini_input_placeholder {
+  flex: 1;
+  font-size: 1.25vh;
+  color: var(--tx3);
+}
+
+.mini_btn_send {
+  background: var(--mco);
+  border: none;
+  color: var(--txa);
+  font-size: 1.2vh;
+  width: 3.2vh;
+  height: 3.2vh;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/* Typing Dots Animation */
+.mini_typing_dots {
+  display: flex;
+  gap: 0.3vw;
+  align-items: center;
+  padding: 0.4vh 0;
+}
+
+.mini_typing_dots span {
+  width: 0.6vh;
+  height: 0.6vh;
+  background: var(--tx2);
+  border-radius: 50%;
+  animation: miniBounce 1.4s infinite ease-in-out both;
+}
+
+.mini_typing_dots span:nth-child(1) { animation-delay: -0.32s; }
+.mini_typing_dots span:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes miniBounce {
+  0%, 80%, 100% { transform: scale(0); }
+  40% { transform: scale(1); }
+}
+
+@media (max-width: 800px) {
+  .lab_grid {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+}

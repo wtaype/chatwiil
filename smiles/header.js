@@ -9,8 +9,8 @@ const LOGO = `<a href="/"><i class="fa-solid ${icon}"></i> ${app}</a>`;
 const buildNav = (items, wi, pageAct) => items.map(i => {
   if (i.isBtn) return `<button class="${i.cls}"><i class="fas ${i.ico}"></i><span>${i.txt}</span></button>`;
   if (i.isPerfil) {
-    const isAct = pageAct === 'perfil';
-    return `<a href="/perfil" class="nv_item ${isAct ? 'active' : ''}" data-page="perfil"><img src="${wi?.avatar || `${import.meta.env.BASE_URL}smile.avif`}" alt="${wi?.nombre}"><span>${wi?.nombre}</span></a>`;
+    const isAct = pageAct.startsWith('cuenta/perfil');
+    return `<a href="/cuenta/perfil" class="nv_item ${isAct ? 'active' : ''}" data-page="cuenta/perfil"><img src="${wi?.avatar || `${import.meta.env.BASE_URL}smile.avif`}" alt="${wi?.nombre}"><span>${wi?.nombre}</span></a>`;
   }
   if (i.isSalir) return `<button class="nv_item bt_salir" data-page="inicio"><i class="fa-solid fa-sign-out-alt"></i> <span>Salir</span></button>`;
   const isAct = pageAct === i.page;
@@ -61,12 +61,30 @@ const addDocListener = (type, selector, handler) => {
 addDocListener('click', '.wimenu', () => document.body.classList.add('movil_open'));
 addDocListener('click', '.movil_close, .movil_overlay, .movil_nav .nv_item, .movil_nav button', () => document.body.classList.remove('movil_open'));
 
-// ── AUTH LISTENER ─────────────────────────────────────────────────────────────
-wiAuth.on(wi => wi ? renderHeader(wi) : (renderHeader(), rutas.cargand = false, rutas.navigate('/')));
-const wi = wiAuth.user; wi ? renderHeader(wi) : renderHeader();
-
 // ── ROUTE LISTENER — re-renderiza el nav en cada navegación SPA ───────────────
-window.addEventListener('winavigate', ({ detail: { norm } }) => renderHeader(wiAuth.user, norm));
+const checkLayout = (path) => {
+  const isAuth = !!wiAuth.user;
+  const clean = (isAuth && (path === '/' || path === '/inicio')) || path.startsWith('/cuenta') || path.startsWith('/lab') || path.startsWith('/smile');
+  document.body.dataset.layout = clean ? 'auth-clean' : 'public';
+};
+
+// ── AUTH LISTENER ─────────────────────────────────────────────────────────────
+wiAuth.on(wi => {
+  checkLayout(window.location.pathname);
+  if (wi) {
+    renderHeader(wi);
+  } else {
+    renderHeader();
+    rutas.cargand = false;
+    rutas.navigate('/');
+  }
+});
+const wi = wiAuth.user; wi ? renderHeader(wi) : renderHeader();
+window.addEventListener('winavigate', ({ detail: { norm } }) => {
+  checkLayout(norm);
+  renderHeader(wiAuth.user, norm);
+});
+checkLayout(window.location.pathname);
 
 // ── EVENTOS GLOBALES ──────────────────────────────────────────────────────────
 addDocListener('click', '.bt_salir', async () => {
