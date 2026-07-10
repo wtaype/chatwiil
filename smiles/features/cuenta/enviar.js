@@ -6,6 +6,7 @@ import estilosEnviar from './enviar.css?inline';
 import { rtdb } from '@core/firebase-db.js';
 import { ref as dbRef, set as dbSet, onValue } from 'firebase/database';
 import { wiAuth, Mensaje } from '@core/widev/widev.js';
+import { wiMd } from '@core/widev/wimd.js';
 
 // ── Sugerencias rápidas ──────────────────────────────────────────────────────
 const SUGS = [
@@ -28,6 +29,7 @@ const SUGS = [
 // ── Estado local ─────────────────────────────────────────────────────────────
 let _enviando  = false;
 let _unsubConf = null;      // listener de confirmación (cuando el nodo se borra = recibido)
+let _unsubUltimo = null;    // listener del último mensaje de Chatwii
 const _historial = [];
 
 // ── render ───────────────────────────────────────────────────────────────────
@@ -82,6 +84,16 @@ export const render = () => {
         <ul class="env_historial_list" id="envHistorialList">
           <li class="env_historial_empty">Aún no has enviado mensajes.</li>
         </ul>
+      </div>
+
+      <!-- Última respuesta de Chatwii -->
+      <div class="env_ultimo wi_fadeUp" id="envUltimoWrap" style="display:none">
+        <p class="env_historial_title">
+          <i class="fas fa-robot"></i>
+          Última respuesta de Chatwii
+        </p>
+        <div class="env_ultimo_burbuja" id="envUltimoTexto"></div>
+        <span class="env_ultimo_ts" id="envUltimoTs"></span>
       </div>
 
     </div>
@@ -197,11 +209,36 @@ export const init = () => {
       _enviar();
     }
   });
+
+  // ── Escuchar última respuesta de Chatwii en tiempo real ──────────────────
+  const ultimoRef  = dbRef(rtdb, `mensajes/${uid}/ultimo`);
+  const ultimoWrap = document.getElementById('envUltimoWrap');
+  const ultimoTxt  = document.getElementById('envUltimoTexto');
+  const ultimoTs   = document.getElementById('envUltimoTs');
+
+  if (_unsubUltimo) _unsubUltimo();
+  _unsubUltimo = onValue(ultimoRef, (snapshot) => {
+    if (!snapshot.exists()) return;
+    const data = snapshot.val();
+    if (!data?.texto) return;
+
+    if (ultimoWrap) ultimoWrap.style.display = '';
+    if (ultimoTxt)  ultimoTxt.innerHTML = wiMd(data.texto);
+    if (ultimoTs && data.ts) {
+      ultimoTs.textContent = new Date(data.ts).toLocaleTimeString();
+    }
+    // Animar entrada
+    if (ultimoWrap) {
+      ultimoWrap.classList.remove('wi_visible');
+      requestAnimationFrame(() => ultimoWrap.classList.add('wi_visible'));
+    }
+  });
 };
 
 // ── cleanup ──────────────────────────────────────────────────────────────────
 export const cleanup = () => {
-  if (_unsubConf) { _unsubConf(); _unsubConf = null; }
+  if (_unsubConf)   { _unsubConf();   _unsubConf   = null; }
+  if (_unsubUltimo) { _unsubUltimo(); _unsubUltimo = null; }
   _enviando = false;
 };
 
